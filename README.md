@@ -59,16 +59,16 @@ _**Optional**_
 
 After initial setup, logging is as easy as:
 ```javascript
-// Simplest use case
+# Simplest use case
 log.info('My Sample Log Line');
 
-// Add a custom level
-log,info('My Sample Log Line', { 'level': MyCustomLevel' });
+# Add a custom level
+log.info('My Sample Log Line', { 'level': MyCustomLevel' });
 
-// Include an App name with this specific log
+# Include an App name with this specific log
 log.info('My Sample Log Line', { level: 'Warn', app: 'myAppName'});
 
-// Pass any associated objects along for context
+# Pass any associated objects along for context
 var context = {
     foo: 'bar',
     nested: {
