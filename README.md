@@ -209,7 +209,7 @@ If this option is turned to true then meta objects will be parsed and will be se
 _Optional_
 Default: `time.time()`
 
-A timestamp in ms, must be within one day otherwise it will be dropped and Date.now() will be used in its place.
+A timestamp in ms, must be within one day otherwise it will be dropped and time.time() will be used in its place.
 
 
 ## License
