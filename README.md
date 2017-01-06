@@ -66,19 +66,19 @@ log.info('My Sample Log Line')
 log.info('My Sample Log Line', { 'level': 'MyCustomLevel' })
 
 # Include an App name with this specific log
-log.info('My Sample Log Line', { level: 'Warn', app: 'myAppName'})
+log.info('My Sample Log Line', { 'level': 'Warn', 'app': 'myAppName'})
 
 # Pass any associated objects along for context
-var context = {
-    foo: 'bar',
-    nested: {
-      nest1: 'nested text'
+context = {
+    'foo': 'bar',
+    'nested': {
+      'nest1': 'nested text'
     }
 }
 
-var opts = {
-  level: 'warn',
-  context: context
+opts = {
+  'level': 'warn',
+  'context': context
 }
 
 log.info('My Sample Log Line', opts)
@@ -99,7 +99,7 @@ The [LogDNA API Key](https://app.logdna.com/manage/profile) associated with your
 
 ##### app
 
-_**Optional**_
+_Optional_
 Type: `String`
 Default: `''`
 Values: `YourCustomApp`
@@ -109,7 +109,7 @@ The default app passed along with every log sent through this instance.
 
 ##### hostname
 
-_**Optional**_
+_Optional_
 Type: `String`
 Default: `''`
 Values: `YourCustomHostname`
@@ -119,7 +119,7 @@ The default hostname passed along with every log sent through this instance.
 
 ##### index_meta
 
-_**Optional**_
+_Optional_
 Type: `Boolean`
 Default: `False`
 
@@ -130,18 +130,10 @@ If this option is turned to true then meta objects will be parsed and will be se
 
 *WARNING* When this option is true, your metadata objects across all types of log messages MUST have consistent types or log entries will be silently dropped!
 
-##### ip
-
-_**Optional**_
-Type: `String`
-Default: `''`
-Values: `10.0.0.1`
-
-The default IP Address passed along with every log sent through this instance.
 
 ##### level
 
-_**Optional**_
+_Optional_
 Type: `String`
 Default: `Info`
 Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
@@ -152,7 +144,7 @@ The default level passed along with every log sent through this instance.
 
 ##### max_length
 
-_**Optional**_
+_Optional_
 Type: `Boolean`
 Default: `True`
 
@@ -163,7 +155,7 @@ By default the line has a maximum length of 32000 chars, this can be turned off 
 
 #### line
 
-_**Required**_
+_Required_
 Type: `String`
 Default: `''`
 Max Length: `32000`
@@ -174,7 +166,7 @@ The line which will be sent to the LogDNA system.
 
 ##### level
 
-_**Optional**_
+_Optional_
 Type: `String`
 Default: `Info`
 Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
@@ -184,7 +176,7 @@ The level passed along with this log line.
 
 ##### app
 
-_**Optional**_
+_Optional_
 Type: `String`
 Default: `''`
 Values: `YourCustomApp`
@@ -194,7 +186,7 @@ The app passed along with this log line.
 
 ##### context
 
-_**Optional**_
+_Optional_
 Type: `JSON`
 Default: `None`
 
@@ -202,7 +194,7 @@ A meta object for additional context about the log line that is passed.
 
 ##### index_meta
 
-_**Optional**_
+_Optional_
 Type: `Boolean`
 Default: `False`
 
@@ -215,7 +207,7 @@ If this option is turned to true then meta objects will be parsed and will be se
 
 ##### timestamp
 
-_**Optional**_
+_Optional_
 Default: `time.time()`
 
 A timestamp in ms, must be within one day otherwise it will be dropped and Date.now() will be used in its place.
