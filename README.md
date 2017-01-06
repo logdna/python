@@ -35,7 +35,7 @@ options = {
 }
 
 # Defaults to false, when true ensures meta object will be searchable
-options['index_meta'] = True;
+options['index_meta'] = True
 
 test = LogDNAHandler(key, options)
 
@@ -58,15 +58,15 @@ _**Optional**_
 ## Usage
 
 After initial setup, logging is as easy as:
-```javascript
+```python
 # Simplest use case
 log.info('My Sample Log Line');
 
 # Add a custom level
-log.info('My Sample Log Line', { 'level': 'MyCustomLevel' });
+log.info('My Sample Log Line', { 'level': 'MyCustomLevel' })
 
 # Include an App name with this specific log
-log.info('My Sample Log Line', { level: 'Warn', app: 'myAppName'});
+log.info('My Sample Log Line', { level: 'Warn', app: 'myAppName'})
 
 # Pass any associated objects along for context
 var context = {
@@ -81,7 +81,7 @@ var opts = {
   context: context
 }
 
-log.info('My Sample Log Line', opts);
+log.info('My Sample Log Line', opts)
 ```
 ## API
 
