@@ -52,15 +52,15 @@ _**Optional**_
 * Hostname - *(String)* - max length 32 chars
 * MAC Address - *(String)*
 * IP Address - *(String)*
-* Max Length - *(Boolean)* - formatted as options.max_length
-* Index Meta - *(Boolean)* - formatted as options.index_meta
+* Max Length - *(Boolean)* - formatted as options['max_length']
+* Index Meta - *(Boolean)* - formatted as options['index_meta']
 
 ## Usage
 
 After initial setup, logging is as easy as:
 ```python
 # Simplest use case
-log.info('My Sample Log Line');
+log.info('My Sample Log Line')
 
 # Add a custom level
 log.info('My Sample Log Line', { 'level': 'MyCustomLevel' })
