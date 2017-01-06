@@ -63,7 +63,7 @@ After initial setup, logging is as easy as:
 log.info('My Sample Log Line');
 
 # Add a custom level
-log.info('My Sample Log Line', { 'level': MyCustomLevel' });
+log.info('My Sample Log Line', { 'level': 'MyCustomLevel' });
 
 # Include an App name with this specific log
 log.info('My Sample Log Line', { level: 'Warn', app: 'myAppName'});
