@@ -121,7 +121,7 @@ The default hostname passed along with every log sent through this instance.
 
 _**Optional**_
 Type: `Boolean`
-Default: `false`
+Default: `False`
 
 We allow meta objects to be passed with each line. By default these meta objects will be stringified and will not be searchable,
 but will be displayed for informational purposes.
@@ -154,7 +154,7 @@ The default level passed along with every log sent through this instance.
 
 _**Optional**_
 Type: `Boolean`
-Default: `true`
+Default: `True`
 
 By default the line has a maximum length of 32000 chars, this can be turned off with the value false.
 
@@ -196,7 +196,7 @@ The app passed along with this log line.
 
 _**Optional**_
 Type: `JSON`
-Default: `null`
+Default: `None`
 
 A meta object for additional context about the log line that is passed.
 
@@ -204,7 +204,7 @@ A meta object for additional context about the log line that is passed.
 
 _**Optional**_
 Type: `Boolean`
-Default: `false`
+Default: `False`
 
 We allow meta objects to be passed with each line. By default these meta objects will be stringified and will not be searchable,
 but will be displayed for informational purposes.
@@ -216,7 +216,7 @@ If this option is turned to true then meta objects will be parsed and will be se
 ##### timestamp
 
 _**Optional**_
-Default: `Date.now()`
+Default: `time.time()`
 
 A timestamp in ms, must be within one day otherwise it will be dropped and Date.now() will be used in its place.
 
