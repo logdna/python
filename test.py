@@ -22,9 +22,9 @@ log.info("Info message")
 
 # Lines will be in order upon refresh
 def timeThis():
-    for x in range(10000):
-        log.info('DINGLEBOP ' + x)
+    for x in range(100):
+        log.info('DINGLEBOP ' + str(x))
 
-print timeit.timeit(timeThis, number=10)
+print timeit.timeit(timeThis, number=2)
 
 # print h.heap()

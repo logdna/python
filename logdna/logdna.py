@@ -3,7 +3,7 @@ import time
 import json
 import configs
 import logging
-import grequests
+import requests
 
 from threading import Timer
 from socket import gethostname
@@ -49,7 +49,7 @@ class LogDNAHandler(logging.Handler):
         if not self.buf or len(self.buf) < 0:
             return
         data = {'e': 'ls', 'ls': self.buf}
-        resp = grequests.post(url=configs.defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True)
+        resp = requests.post(url=configs.defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True)
         # print(self.buf)
         self.buf = []
         self.bufByteLength = 0
