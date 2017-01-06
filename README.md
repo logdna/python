@@ -16,7 +16,7 @@
 
 ## Install
 
-```python
+```bash
 $ pip install logdna
 ```
 
@@ -34,7 +34,7 @@ options = {
   'hostname': 'pytest'
 }
 
-// Defaults to false, when true ensures meta object will be searchable
+# Defaults to false, when true ensures meta object will be searchable
 options['index_meta'] = True;
 
 test = LogDNAHandler(key, options)
