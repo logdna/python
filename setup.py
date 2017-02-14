@@ -7,7 +7,7 @@ setup(
   author = 'Answerbook Inc.',
   author_email = 'help@logdna.com',
   url = 'https://github.com/logdna/python',
-  download_url = 'https://github.com/logdna/python/tarball/1.0.1',
+  download_url = 'https://github.com/logdna/python/tarball/1.0.2',
   keywords = ['logdna', 'logging', 'logs', 'python', 'logdna.com', 'logger'],
   classifiers = [],
 )
