@@ -1,7 +1,7 @@
 import sys
 import time
 import json
-from logdna import configs
+from .configs import defaults
 import logging
 import requests
 
@@ -24,16 +24,16 @@ class LogDNAHandler(logging.Handler):
         self.index_meta = False
         if 'index_meta' in options:
             self.index_meta = options['index_meta']
-        self.flushLimit = configs.defaults['FLUSH_BYTE_LIMIT']
-        self.url = configs.defaults['LOGDNA_URL']
+        self.flushLimit = defaults['FLUSH_BYTE_LIMIT']
+        self.url = defaults['LOGDNA_URL']
         self.bufByteLength = 0
         self.flusher = None
 
     def bufferLog(self, message):
         if message and message['line']:
-            if self.max_length and len(message['line']) > configs.defaults['MAX_LINE_LENGTH']:
-                message['line'] = message['line'][:configs.defaults['MAX_LINE_LENGTH']] + ' (cut off, too long...)'
-                print('Line was longer than ' + configs.defaults['MAX_LINE_LENGTH'] + ' chars and was truncated.')
+            if self.max_length and len(message['line']) > defaults['MAX_LINE_LENGTH']:
+                message['line'] = message['line'][:defaults['MAX_LINE_LENGTH']] + ' (cut off, too long...)'
+                print('Line was longer than ' + defaults['MAX_LINE_LENGTH'] + ' chars and was truncated.')
 
             self.bufByteLength += sys.getsizeof(message)
             self.buf.append(message)
@@ -43,13 +43,13 @@ class LogDNAHandler(logging.Handler):
                 return
 
             if not self.flusher:
-                self.flusher = Timer(configs.defaults['FLUSH_INTERVAL'], self.flush())
+                self.flusher = Timer(defaults['FLUSH_INTERVAL'], self.flush())
 
     def flush(self):
         if not self.buf or len(self.buf) < 0:
             return
         data = {'e': 'ls', 'ls': self.buf}
-        resp = requests.post(url=configs.defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True)
+        resp = requests.post(url=defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True)
         # print(self.buf)
         self.buf = []
         self.bufByteLength = 0

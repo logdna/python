@@ -4,6 +4,8 @@
 
 import logging
 import timeit
+import sys
+
 from logdna import LogDNAHandler
 
 # from guppy import hpy
@@ -25,6 +27,6 @@ def timeThis():
     for x in range(100):
         log.info('DINGLEBOP ' + str(x))
 
-print timeit.timeit(timeThis, number=2)
+print (timeit.timeit(timeThis, number=2))
 
 # print h.heap()
