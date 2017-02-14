@@ -1,7 +1,7 @@
 import sys
 import time
 import json
-import configs
+from logdna import configs
 import logging
 import requests
 
@@ -10,6 +10,7 @@ from socket import gethostname
 
 class LogDNAHandler(logging.Handler):
     def __init__(self, token, options={}):
+        self.buf = []
         logging.Handler.__init__(self)
         self.token = token
         self.hostname = options['hostname'] if 'hostname' in options else gethostname()
@@ -26,14 +27,13 @@ class LogDNAHandler(logging.Handler):
         self.flushLimit = configs.defaults['FLUSH_BYTE_LIMIT']
         self.url = configs.defaults['LOGDNA_URL']
         self.bufByteLength = 0
-        self.buf = []
         self.flusher = None
 
     def bufferLog(self, message):
         if message and message['line']:
             if self.max_length and len(message['line']) > configs.defaults['MAX_LINE_LENGTH']:
                 message['line'] = message['line'][:configs.defaults['MAX_LINE_LENGTH']] + ' (cut off, too long...)'
-                print 'Line was longer than ' + configs.defaults['MAX_LINE_LENGTH'] + ' chars and was truncated.'
+                print('Line was longer than ' + configs.defaults['MAX_LINE_LENGTH'] + ' chars and was truncated.')
 
             self.bufByteLength += sys.getsizeof(message)
             self.buf.append(message)
