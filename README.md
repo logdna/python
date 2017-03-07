@@ -68,8 +68,8 @@ log.info('My Sample Log Line', { 'level': 'MyCustomLevel' })
 # Include an App name with this specific log
 log.info('My Sample Log Line', { 'level': 'Warn', 'app': 'myAppName'})
 
-# Pass any associated objects along for context
-context = {
+# Pass any associated objects along as metadata
+meta = {
     'foo': 'bar',
     'nested': {
       'nest1': 'nested text'
@@ -78,7 +78,7 @@ context = {
 
 opts = {
   'level': 'warn',
-  'context': context
+  'meta': meta
 }
 
 log.info('My Sample Log Line', opts)
@@ -123,8 +123,7 @@ _Optional_
 Type: `Boolean`
 Default: `False`
 
-We allow meta objects to be passed with each line. By default these meta objects will be stringified and will not be searchable,
-but will be displayed for informational purposes.
+We allow meta objects to be passed with each line. By default these meta objects will be stringified and will not be searchable, but will be displayed for informational purposes.
 
 If this option is turned to true then meta objects will be parsed and will be searchable up to three levels deep. Any fields deeper than three levels will be stringified and cannot be searched.
 
@@ -184,13 +183,13 @@ Max Length: `32`
 
 The app passed along with this log line.
 
-##### context
+##### meta
 
 _Optional_
 Type: `JSON`
 Default: `None`
 
-A meta object for additional context about the log line that is passed.
+A meta object for additional metadata about the log line that is passed.
 
 ##### index_meta
 
