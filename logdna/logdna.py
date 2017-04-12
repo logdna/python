@@ -77,11 +77,11 @@ class LogDNAHandler(logging.Handler):
             message['hostname'] = opts['hostname']
         if 'timestamp' in opts:
             message['timestamp'] = opts['timestamp']
-        if 'context' in opts:
+        if 'meta' in opts:
             if self.index_meta:
-                message['meta'] = opts['context']
+                message['meta'] = opts['meta']
             else:
-                message['meta'] = json.dumps(opts['context'])
+                message['meta'] = json.dumps(opts['meta'])
 
         self.bufferLog(message)
 
