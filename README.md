@@ -25,7 +25,7 @@ $ pip install logdna
 import logging
 from logdna import LogDNAHandler
 
-key = 'YOUR API KEY HERE'
+key = 'YOUR INGESTION KEY HERE'
 
 log = logging.getLogger('logdna')
 log.setLevel(logging.INFO)
@@ -46,7 +46,7 @@ log.info("Info message")
 
 ```
 _**Required**_
-* [LogDNA API Key](https://app.logdna.com/manage/profile)
+* [LogDNA Ingestion Key](https://app.logdna.com/manage/profile)
 
 _**Optional**_
 * Hostname - *(String)* - max length 32 chars
