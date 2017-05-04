@@ -147,7 +147,7 @@ _Optional_
 Type: `Boolean`
 Default: `True`
 
-By default the line has a maximum length of 32000 chars, this can be turned off with the value false.
+By default the line has a maximum length of 16000 chars, this can be turned off with the value false.
 
 
 ### log(line, [options])
