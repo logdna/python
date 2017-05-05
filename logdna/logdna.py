@@ -43,7 +43,8 @@ class LogDNAHandler(logging.Handler):
                 return
 
             if not self.flusher:
-                self.flusher = Timer(defaults['FLUSH_INTERVAL'], self.flush())
+                self.flusher = Timer(defaults['FLUSH_INTERVAL'], self.flush)
+                self.flusher.start()
 
     def flush(self):
         if not self.buf or len(self.buf) < 0:
