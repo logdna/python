@@ -50,13 +50,15 @@ class LogDNAHandler(logging.Handler):
         if not self.buf or len(self.buf) < 0:
             return
         data = {'e': 'ls', 'ls': self.buf}
-        resp = requests.post(url=defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True)
-        # print(self.buf)
-        self.buf = []
-        self.bufByteLength = 0
-        if self.flusher:
-            self.flusher.cancel()
-            self.flusher = None
+        try:
+            resp = requests.post(url=defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True, timeout=defaults['MAX_REQUEST_TIMEOUT'])
+            self.buf = []
+            self.bufByteLength = 0
+            if self.flusher:
+                self.flusher.cancel()
+                self.flusher = None
+        except requests.exceptions.RequestException as e:
+            print e
 
     def emit(self, record):
         record = record.__dict__
