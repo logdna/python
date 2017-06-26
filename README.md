@@ -5,7 +5,7 @@
   <p align="center">Python package for logging to <a href="https://app.logdna.com">LogDNA</a></p>
 </p>
 
-===
+---
 
 * **[Install](#install)**
 * **[Setup](#setup)**
