@@ -7,6 +7,7 @@ import requests
 
 from threading import Timer
 from socket import gethostname
+logger = logging.getLogger(__name__)
 
 class LogDNAHandler(logging.Handler):
     def __init__(self, token, options={}):
@@ -58,7 +59,7 @@ class LogDNAHandler(logging.Handler):
                 self.flusher.cancel()
                 self.flusher = None
         except requests.exceptions.RequestException as e:
-            return
+            logger.error('Error in request to LogDNA: ' + str(e))
 
     def emit(self, record):
         record = record.__dict__
