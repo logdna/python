@@ -58,7 +58,7 @@ class LogDNAHandler(logging.Handler):
                 self.flusher.cancel()
                 self.flusher = None
         except requests.exceptions.RequestException as e:
-            print e
+            return
 
     def emit(self, record):
         record = record.__dict__
