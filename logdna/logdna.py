@@ -34,7 +34,7 @@ class LogDNAHandler(logging.Handler):
         if message and message['line']:
             if self.max_length and len(message['line']) > defaults['MAX_LINE_LENGTH']:
                 message['line'] = message['line'][:defaults['MAX_LINE_LENGTH']] + ' (cut off, too long...)'
-                print('Line was longer than {0} chars and was truncated.'.format(defaults['MAX_LINE_LENGTH'])
+                logger.debug('Line was longer than ' + str(defaults['MAX_LINE_LENGTH']) + ' chars and was truncated.')
 
             self.bufByteLength += sys.getsizeof(message)
             self.buf.append(message)
