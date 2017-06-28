@@ -62,6 +62,7 @@ class LogDNAHandler(logging.Handler):
             logger.error('Error in request to LogDNA: ' + str(e))
 
     def emit(self, record):
+        msg = self.format(record)
         record = record.__dict__
         opts = {}
         if 'args' in record:
@@ -69,7 +70,7 @@ class LogDNAHandler(logging.Handler):
         message = {
             'hostname' : self.hostname,
             'timestamp': int(time.time()),
-            'line': record['msg'],
+            'line': msg,
             'level': record['levelname'] or self.level,
             'app': self.app or record['module']
         }
