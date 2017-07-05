@@ -90,4 +90,12 @@ class LogDNAHandler(logging.Handler):
         self.bufferLog(message)
 
     def close(self):
-        logging.Handler.close(self)
+        """
+        Close the log handler.
+        
+        Make sure that the log handler has attempted to flush the log buffer before closing.
+        """
+        try:
+            self.flush()
+        finally:
+            logging.Handler.close(self)
