@@ -26,6 +26,7 @@ log.info("Info message")
 def timeThis():
     for x in range(100):
         log.info('DINGLEBOP ' + str(x))
+        log.info('%s before you %s', 'Look', 'Leap')
 
 print (timeit.timeit(timeThis, number=2))
 
