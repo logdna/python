@@ -4,7 +4,7 @@ import json
 from .configs import defaults
 import logging
 import requests
-
+import threading
 from threading import Timer
 from socket import gethostname
 logger = logging.getLogger(__name__)
@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 class LogDNAHandler(logging.Handler):
     def __init__(self, token, options={}):
         self.buf = []
+        self.secondary = [];
         logging.Handler.__init__(self)
         self.token = token
         self.hostname = options['hostname'] if 'hostname' in options else gethostname()
@@ -29,6 +30,7 @@ class LogDNAHandler(logging.Handler):
         self.url = defaults['LOGDNA_URL']
         self.bufByteLength = 0
         self.flusher = None
+        self.lock = threading.RLock()
 
     def bufferLog(self, message):
         if message and message['line']:
@@ -36,28 +38,43 @@ class LogDNAHandler(logging.Handler):
                 message['line'] = message['line'][:defaults['MAX_LINE_LENGTH']] + ' (cut off, too long...)'
                 logger.debug('Line was longer than ' + str(defaults['MAX_LINE_LENGTH']) + ' chars and was truncated.')
 
-            self.bufByteLength += sys.getsizeof(message)
-            self.buf.append(message)
+        self.bufByteLength += sys.getsizeof(message)
 
+        # Attempt to acquire lock to write to buf, otherwise write to secondary as flush occurs
+        if not self.lock.acquire(blocking=False):
+            self.secondary.append(message)
+        else:
+            self.buf.append(message)
+            self.lock.release();
             if self.bufByteLength >= self.flushLimit:
                 self.flush()
                 return
 
-            if not self.flusher:
-                self.flusher = Timer(defaults['FLUSH_INTERVAL'], self.flush)
-                self.flusher.start()
+        if not self.flusher:
+            self.flusher = Timer(defaults['FLUSH_INTERVAL'], self.flush)
+            self.flusher.start()
 
     def flush(self):
         if not self.buf or len(self.buf) < 0:
             return
         data = {'e': 'ls', 'ls': self.buf}
         try:
-            resp = requests.post(url=defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True, timeout=defaults['MAX_REQUEST_TIMEOUT'])
-            self.buf = []
-            self.bufByteLength = 0
-            if self.flusher:
-                self.flusher.cancel()
-                self.flusher = None
+            # Ensure we have the lock when flushing
+            if not self.lock.acquire(blocking=False):
+                if not self.flusher:
+                    self.flusher = Timer(defaults['FLUSH_NOW'], self.flush)
+                    self.flusher.start()
+            else:
+                resp = requests.post(url=defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True, timeout=defaults['MAX_REQUEST_TIMEOUT'])
+                self.buf = []
+                self.bufByteLength = 0
+                if self.flusher:
+                    self.flusher.cancel()
+                    self.flusher = None
+                self.lock.release();
+                # Ensure messages that could've dropped are appended back onto buf
+                self.buf = self.buf + self.secondary;
+                self.secondary = [];
         except requests.exceptions.RequestException as e:
             logger.error('Error in request to LogDNA: ' + str(e))
 
@@ -93,7 +110,7 @@ class LogDNAHandler(logging.Handler):
     def close(self):
         """
         Close the log handler.
-        
+
         Make sure that the log handler has attempted to flush the log buffer before closing.
         """
         try:
