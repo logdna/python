@@ -107,6 +107,16 @@ Max Length: `32`
 
 The default app passed along with every log sent through this instance.
 
+##### env
+
+_Optional_
+Type: `String`
+Default: `''`
+Values: `YourCustomEnv`
+Max Length: `32`
+
+The default env passed along with every log sent through this instance.
+
 ##### hostname
 
 _Optional_
@@ -182,6 +192,16 @@ Values: `YourCustomApp`
 Max Length: `32`
 
 The app passed along with this log line.
+
+##### env
+
+_Optional_
+Type: `String`
+Default: `''`
+Values: `YourCustomEnv`
+Max Length: `32`
+
+The environment passed with this log line.
 
 ##### meta
 

@@ -18,6 +18,7 @@ class LogDNAHandler(logging.Handler):
         self.hostname = options['hostname'] if 'hostname' in options else gethostname()
         self.level = options['level'] if 'level' in options else 'info'
         self.app = options['app'] if 'app' in options else ''
+        self.env = options['env'] if 'env' in options else ''
         self.setLevel(logging.DEBUG)
 
         self.max_length = True
@@ -90,7 +91,8 @@ class LogDNAHandler(logging.Handler):
             'timestamp': int(time.time()),
             'line': msg,
             'level': record['levelname'] or self.level,
-            'app': self.app or record['module']
+            'app': self.app or record['module'],
+            'env': self.env
         }
         if 'level' in opts:
             message['level'] = opts['level']
@@ -98,6 +100,8 @@ class LogDNAHandler(logging.Handler):
             message['app'] = opts['app']
         if 'hostname' in opts:
             message['hostname'] = opts['hostname']
+        if 'env' in opts:
+            message['env'] = opts['env']
         if 'timestamp' in opts:
             message['timestamp'] = opts['timestamp']
         if 'meta' in opts:
