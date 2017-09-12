@@ -5,8 +5,9 @@
 import logging
 import timeit
 import sys
+import time
 
-from logdna import LogDNAHandler
+from logdna.logdna import LogDNAHandler
 
 # from guppy import hpy
 # h = hpy()
@@ -24,10 +25,20 @@ log.info("Info message")
 
 # Lines will be in order upon refresh
 def timeThis():
-    for x in range(100):
-        log.info('DINGLEBOP ' + str(x))
-        log.info('%s before you %s', 'Look', 'Leap')
+    for x in range(7):
+        log.info('GORPGORP ' + str(x))
+        #log.info('%s before you %s', 'Look', 'Leap')
 
-print (timeit.timeit(timeThis, number=2))
+def main_loop():
+    while 1:
+        print (timeit.timeit(timeThis, number=2))
+        time.sleep(10)
+
+if __name__ == '__main__':
+    try:
+        main_loop()
+    except KeyboardInterrupt:
+        print >> sys.stderr, '\nExiting by user request.\n'
+        sys.exit(0)
 
 # print h.heap()

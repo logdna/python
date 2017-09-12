@@ -77,8 +77,12 @@ class LogDNAHandler(logging.Handler):
                 self.buf = self.buf + self.secondary;
                 self.secondary = [];
         except requests.exceptions.RequestException as e:
+            if self.flusher:
+                self.flusher.cancel()
+                self.flusher = None
             self.lock.release();
             logger.error('Error in request to LogDNA: ' + str(e))
+
 
     def emit(self, record):
         msg = self.format(record)
