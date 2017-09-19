@@ -98,7 +98,7 @@ class LogDNAHandler(logging.Handler):
         if keysToSanitize:
             for key in keysToSanitize:
                 del meta[key]
-            meta['__errors'] = { 'sanitizedKeys': keysToSanitize }
+            meta['__errors'] = 'These keys have been sanitized: ' + ', '.join(keysToSanitize)
         return meta
 
     def emit(self, record):

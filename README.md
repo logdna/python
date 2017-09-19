@@ -210,8 +210,7 @@ Type: `JSON`
 Default: `None`
 
 A meta object for additional metadata about the log line that is passed. Please ensure values are JSON serializable,
-values that are not JSON serializable will be removed and the respective key will be added to the sanitizedKeys
-array for your reference.
+values that are not JSON serializable will be removed and the respective keys will be added to the `__errors` string.
 
 ##### index_meta
 
