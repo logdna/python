@@ -209,7 +209,9 @@ _Optional_
 Type: `JSON`
 Default: `None`
 
-A meta object for additional metadata about the log line that is passed.
+A meta object for additional metadata about the log line that is passed. Please ensure values are JSON serializable,
+values that are not JSON serializable will be removed and the respective key will be added to the sanitizedKeys
+array for your reference.
 
 ##### index_meta
 

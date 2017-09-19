@@ -83,6 +83,23 @@ class LogDNAHandler(logging.Handler):
             self.lock.release();
             logger.error('Error in request to LogDNA: ' + str(e))
 
+    def isJSONable(self, obj):
+        try:
+            json.dumps(obj)
+            return True
+        except:
+            return False
+
+    def sanitizeMeta(self, meta):
+        keysToSanitize = []
+        for key,value in meta.items():
+            if not self.isJSONable(value):
+                keysToSanitize.append(key)
+        if keysToSanitize:
+            for key in keysToSanitize:
+                del meta[key]
+            meta['__errors'] = { 'sanitizedKeys': keysToSanitize }
+        return meta
 
     def emit(self, record):
         msg = self.format(record)
@@ -110,7 +127,7 @@ class LogDNAHandler(logging.Handler):
             message['timestamp'] = opts['timestamp']
         if 'meta' in opts:
             if self.index_meta:
-                message['meta'] = opts['meta']
+                message['meta'] = self.sanitizeMeta(opts['meta'])
             else:
                 message['meta'] = json.dumps(opts['meta'])
 
