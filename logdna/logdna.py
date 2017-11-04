@@ -109,7 +109,7 @@ class LogDNAHandler(logging.Handler):
             opts = record['args']
         message = {
             'hostname' : self.hostname,
-            'timestamp': int(time.time()),
+            'timestamp': int(time.time() * 1000),
             'line': msg,
             'level': record['levelname'] or self.level,
             'app': self.app or record['module'],
