@@ -86,12 +86,12 @@ log.info('My Sample Log Line', opts)
 ## API
 
 ### LogDNAHandler(key, [options])
-
+---
 #### key
 
-_**Required**_
-Type: `String`
-Values: `YourAPIKey`
+* _**Required**_
+* Type: `String`
+* Values: `YourAPIKey`
 
 The [LogDNA API Key](https://app.logdna.com/manage/profile) associated with your account.
 
@@ -99,39 +99,39 @@ The [LogDNA API Key](https://app.logdna.com/manage/profile) associated with your
 
 ##### app
 
-_Optional_
-Type: `String`
-Default: `''`
-Values: `YourCustomApp`
-Max Length: `32`
+* _Optional_
+* Type: `String`
+* Default: `''`
+* Values: `YourCustomApp`
+* Max Length: `32`
 
 The default app passed along with every log sent through this instance.
 
 ##### env
 
-_Optional_
-Type: `String`
-Default: `''`
-Values: `YourCustomEnv`
-Max Length: `32`
+* _Optional_
+* Type: `String`
+* Default: `''`
+* Values: `YourCustomEnv`
+* Max Length: `32`
 
 The default env passed along with every log sent through this instance.
 
 ##### hostname
 
-_Optional_
-Type: `String`
-Default: `''`
-Values: `YourCustomHostname`
-Max Length: `32`
+* _Optional_
+* Type: `String`
+* Default: `''`
+* Values: `YourCustomHostname`
+* Max Length: `32`
 
 The default hostname passed along with every log sent through this instance.
 
 ##### index_meta
 
-_Optional_
-Type: `Boolean`
-Default: `False`
+* _Optional_
+* Type: `Boolean`
+* Default: `False`
 
 We allow meta objects to be passed with each line. By default these meta objects will be stringified and will not be searchable, but will be displayed for informational purposes.
 
@@ -142,32 +142,32 @@ If this option is turned to true then meta objects will be parsed and will be se
 
 ##### level
 
-_Optional_
-Type: `String`
-Default: `Info`
-Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
-Max Length: `32`
+* _Optional_
+* Type: `String`
+* Default: `Info`
+* Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
+* Max Length: `32`
 
 The default level passed along with every log sent through this instance.
 
 
 ##### max_length
 
-_Optional_
-Type: `Boolean`
-Default: `True`
+* _Optional_
+* Type: `Boolean`
+* Default: `True`
 
 By default the line has a maximum length of 16000 chars, this can be turned off with the value false.
 
 
 ### log(line, [options])
-
+---
 #### line
 
-_Required_
-Type: `String`
-Default: `''`
-Max Length: `32000`
+* _Required_
+* Type: `String`
+* Default: `''`
+* Max Length: `32000`
 
 The line which will be sent to the LogDNA system.
 
@@ -175,48 +175,48 @@ The line which will be sent to the LogDNA system.
 
 ##### level
 
-_Optional_
-Type: `String`
-Default: `Info`
-Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
-Max Length: `32`
+* _Optional_
+* Type: `String`
+* Default: `Info`
+* Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
+* Max Length: `32`
 
 The level passed along with this log line.
 
 ##### app
 
-_Optional_
-Type: `String`
-Default: `''`
-Values: `YourCustomApp`
-Max Length: `32`
+* _Optional_
+* Type: `String`
+* Default: `''`
+* Values: `YourCustomApp`
+* Max Length: `32`
 
 The app passed along with this log line.
 
 ##### env
 
-_Optional_
-Type: `String`
-Default: `''`
-Values: `YourCustomEnv`
-Max Length: `32`
+* _Optional_
+* Type: `String`
+* Default: `''`
+* Values: `YourCustomEnv`
+* Max Length: `32`
 
 The environment passed with this log line.
 
 ##### meta
 
-_Optional_
-Type: `JSON`
-Default: `None`
+* _Optional_
+* Type: `JSON`
+* Default: `None`
 
 A meta object for additional metadata about the log line that is passed. Please ensure values are JSON serializable,
 values that are not JSON serializable will be removed and the respective keys will be added to the `__errors` string.
 
 ##### index_meta
 
-_Optional_
-Type: `Boolean`
-Default: `False`
+* _Optional_
+* Type: `Boolean`
+* Default: `False`
 
 We allow meta objects to be passed with each line. By default these meta objects will be stringified and will not be searchable,
 but will be displayed for informational purposes.
@@ -227,8 +227,8 @@ If this option is turned to true then meta objects will be parsed and will be se
 
 ##### timestamp
 
-_Optional_
-Default: `time.time()`
+* _Optional_
+* Default: `time.time()`
 
 A timestamp in ms, must be within one day otherwise it will be dropped and time.time() will be used in its place.
 
