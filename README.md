@@ -31,7 +31,9 @@ log = logging.getLogger('logdna')
 log.setLevel(logging.INFO)
 
 options = {
-  'hostname': 'pytest'
+  'hostname': 'pytest',
+  'ip': '10.0.1.1',
+  'mac': 'C0:FF:EE:C0:FF:EE'
 }
 
 # Defaults to false, when true ensures meta object will be searchable

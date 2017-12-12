@@ -5,17 +5,19 @@ from .configs import defaults
 import logging
 import requests
 import threading
+import socket
 from threading import Timer
-from socket import gethostname
 logger = logging.getLogger(__name__)
 
 class LogDNAHandler(logging.Handler):
-    def __init__(self, token, options={}):
+    def __init__(self, key, options={}):
         self.buf = []
         self.secondary = [];
         logging.Handler.__init__(self)
-        self.token = token
+        self.key = key
         self.hostname = options['hostname'] if 'hostname' in options else gethostname()
+        self.ip = options['ip'] if 'ip' in options else self.get_ip()
+        self.mac = options['mac'] if 'mac' in options else None
         self.level = options['level'] if 'level' in options else 'info'
         self.app = options['app'] if 'app' in options else ''
         self.env = options['env'] if 'env' in options else ''
@@ -66,7 +68,7 @@ class LogDNAHandler(logging.Handler):
                     self.flusher = Timer(defaults['FLUSH_NOW'], self.flush)
                     self.flusher.start()
             else:
-                resp = requests.post(url=defaults['LOGDNA_URL'], json=data, auth=('user', self.token), params={ 'hostname': self.hostname }, stream=True, timeout=defaults['MAX_REQUEST_TIMEOUT'])
+                resp = requests.post(url=defaults['LOGDNA_URL'], json=data, auth=('user', self.key), params={ 'hostname': self.hostname, 'ip': self.ip, 'mac': self.mac if self.mac else None }, stream=True, timeout=defaults['MAX_REQUEST_TIMEOUT'])
                 self.buf = []
                 self.bufByteLength = 0
                 if self.flusher:
@@ -132,6 +134,18 @@ class LogDNAHandler(logging.Handler):
                 message['meta'] = json.dumps(opts['meta'])
 
         self.bufferLog(message)
+
+    def get_ip(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            # doesn't even have to be reachable
+            s.connect(('10.255.255.255', 1))
+            IP = s.getsockname()[0]
+        except:
+            IP = '127.0.0.1'
+        finally:
+            s.close()
+        return IP
 
     def close(self):
         """
