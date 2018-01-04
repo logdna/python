@@ -15,7 +15,7 @@ class LogDNAHandler(logging.Handler):
         self.secondary = [];
         logging.Handler.__init__(self)
         self.key = key
-        self.hostname = options['hostname'] if 'hostname' in options else gethostname()
+        self.hostname = options['hostname'] if 'hostname' in options else socket.gethostname()
         self.ip = options['ip'] if 'ip' in options else self.get_ip()
         self.mac = options['mac'] if 'mac' in options else None
         self.level = options['level'] if 'level' in options else 'info'
