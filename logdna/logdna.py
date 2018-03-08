@@ -117,21 +117,22 @@ class LogDNAHandler(logging.Handler):
             'app': self.app or record['module'],
             'env': self.env
         }
-        if 'level' in opts:
-            message['level'] = opts['level']
-        if 'app' in opts:
-            message['app'] = opts['app']
-        if 'hostname' in opts:
-            message['hostname'] = opts['hostname']
-        if 'env' in opts:
-            message['env'] = opts['env']
-        if 'timestamp' in opts:
-            message['timestamp'] = opts['timestamp']
-        if 'meta' in opts:
-            if self.index_meta:
-                message['meta'] = self.sanitizeMeta(opts['meta'])
-            else:
-                message['meta'] = json.dumps(opts['meta'])
+        if not isinstance(opts, tuple):
+            if 'level' in opts:
+                message['level'] = opts['level']
+            if 'app' in opts:
+                message['app'] = opts['app']
+            if 'hostname' in opts:
+                message['hostname'] = opts['hostname']
+            if 'env' in opts:
+                message['env'] = opts['env']
+            if 'timestamp' in opts:
+                message['timestamp'] = opts['timestamp']
+            if 'meta' in opts:
+                if self.index_meta:
+                    message['meta'] = self.sanitizeMeta(opts['meta'])
+                else:
+                    message['meta'] = json.dumps(opts['meta'])
 
         self.bufferLog(message)
 
