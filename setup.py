@@ -2,7 +2,7 @@ from distutils.core import setup
 setup(
   name = 'logdna',
   packages = ['logdna'],
-  version = '1.2.4',
+  version = '1.2.5',
   description = 'A python package for sending logs to LogDNA',
   author = 'Answerbook Inc.',
   author_email = 'help@logdna.com',
