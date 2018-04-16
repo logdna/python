@@ -129,6 +129,15 @@ The default env passed along with every log sent through this instance.
 
 The default hostname passed along with every log sent through this instance.
 
+##### include_standard_meta
+
+* _Optional_
+* Type: `Boolean`
+* Default: `False`
+
+Python [`LogRecord` objects](https://docs.python.org/2/library/logging.html#logrecord-objects) include language-specific information that may be useful metadata in logs.  Setting `include_standard_meta` to `True` will automatically populate meta objects with `name`, `pathname`, and `lineno` from the `LogRecord`.  See [`LogRecord` docs](https://docs.python.org/2/library/logging.html#logrecord-objects) for more detail on these values.
+
+
 ##### index_meta
 
 * _Optional_

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
         self.buf = []
-        self.secondary = [];
+        self.secondary = []
         logging.Handler.__init__(self)
         self.key = key
         self.hostname = options['hostname'] if 'hostname' in options else socket.gethostname()
@@ -29,6 +29,9 @@ class LogDNAHandler(logging.Handler):
         self.index_meta = False
         if 'index_meta' in options:
             self.index_meta = options['index_meta']
+        self.include_standard_meta = False
+        if 'include_standard_meta' in options:
+            self.include_standard_meta = options['include_standard_meta']
         self.flushLimit = defaults['FLUSH_BYTE_LIMIT']
         self.url = defaults['LOGDNA_URL']
         self.bufByteLength = 0
@@ -109,8 +112,16 @@ class LogDNAHandler(logging.Handler):
         opts = {}
         if 'args' in record:
             opts = record['args']
+        if self.include_standard_meta:
+            if isinstance(opts, tuple):
+                opts = {}
+            if 'meta' not in opts:
+                opts['meta'] = {}
+            for key in ['name', 'pathname', 'lineno']:
+                opts['meta'][key] = record[key]
+
         message = {
-            'hostname' : self.hostname,
+            'hostname': self.hostname,
             'timestamp': int(time.time() * 1000),
             'line': msg,
             'level': record['levelname'] or self.level,
