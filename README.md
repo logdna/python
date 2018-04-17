@@ -205,6 +205,15 @@ The default level passed along with every log sent through this instance.
 By default the line has a maximum length of 16000 chars, this can be turned off with the value false.
 
 
+##### tags
+
+* _Optional_
+* Type: `String[]`
+* Default: `[]`
+
+List of tags used to dynamically group hosts.  More information on tags is available at [How Do I Use Host Tags?](https://docs.logdna.com/docs/logdna-agent#section-how-do-i-use-host-tags-)
+
+
 ### log(line, [options])
 ---
 #### line

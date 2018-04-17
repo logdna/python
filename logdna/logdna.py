@@ -23,6 +23,9 @@ class LogDNAHandler(logging.Handler):
         self.env = options['env'] if 'env' in options else ''
         self.setLevel(logging.DEBUG)
 
+        self.tags = []
+        if 'tags' in options and isinstance(options['tags'], list):
+            self.tags.extend(options['tags'])
         self.max_length = True
         if 'max_length' in options:
             self.max_length = options['max_length']
@@ -71,7 +74,17 @@ class LogDNAHandler(logging.Handler):
                     self.flusher = Timer(defaults['FLUSH_NOW'], self.flush)
                     self.flusher.start()
             else:
-                resp = requests.post(url=defaults['LOGDNA_URL'], json=data, auth=('user', self.key), params={ 'hostname': self.hostname, 'ip': self.ip, 'mac': self.mac if self.mac else None }, stream=True, timeout=defaults['MAX_REQUEST_TIMEOUT'])
+                resp = requests.post(
+                    url=defaults['LOGDNA_URL'],
+                    json=data,
+                    auth=('user', self.key),
+                    params={
+                        'hostname': self.hostname,
+                        'ip': self.ip,
+                        'mac': self.mac if self.mac else None,
+                        'tags': self.tags if self.tags else None},
+                    stream=True,
+                    timeout=defaults['MAX_REQUEST_TIMEOUT'])
                 self.buf = []
                 self.bufByteLength = 0
                 if self.flusher:
