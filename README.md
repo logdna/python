@@ -85,6 +85,40 @@ opts = {
 
 log.info('My Sample Log Line', opts)
 ```
+
+### Usage with File Config
+
+To use `LogDNAHandler` with [`fileConfig`](https://docs.python.org/2/library/logging.config.html#logging.config.fileConfig) (e.g., in a Django `settings.py` file):
+
+```python
+import os
+import logging
+from logdna import LogDNAHandler #  required to register `logging.handlers.LogDNAHandler`
+
+LOGGING = {
+    # Other logging settings...
+    'handlers': {
+        'logdna': {
+            'level': logging.DEBUG,
+            'class': 'logging.handlers.LogDNAHandler',
+            'key': os.environ.get('LOGDNA_INGEST_KEY'),
+            'options': {
+                'app': '<app name>',
+                'env': os.environ.get('ENVIRONMENT'),
+                'index_meta': <True|False>,
+            },
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['logdna'],
+        },
+    },
+}
+```
+
+(This example assumes you have set environment variables for `ENVIRONMENT` and `LOGDNA_INGEST_KEY`)
+
 ## API
 
 ### LogDNAHandler(key, [options])
