@@ -40,6 +40,9 @@ class LogDNAHandler(logging.Handler):
         self.bufByteLength = 0
         self.flusher = None
         self.lock = threading.RLock()
+        self.request_timeout = defaults['MAX_REQUEST_TIMEOUT']
+        if 'request_timeout' in options:
+            self.request_timeout = options['request_timeout']
 
     def bufferLog(self, message):
         if message and message['line']:
@@ -84,7 +87,7 @@ class LogDNAHandler(logging.Handler):
                         'mac': self.mac if self.mac else None,
                         'tags': self.tags if self.tags else None},
                     stream=True,
-                    timeout=defaults['MAX_REQUEST_TIMEOUT'])
+                    timeout=self.request_timeout)
                 self.buf = []
                 self.bufByteLength = 0
                 if self.flusher:

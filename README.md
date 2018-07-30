@@ -205,6 +205,15 @@ The default level passed along with every log sent through this instance.
 By default the line has a maximum length of 16000 chars, this can be turned off with the value false.
 
 
+##### request_timeout
+
+* _Optional_
+* Type: `int`
+* Default: `30000`
+
+The amount of time the request should wait for LogDNA to respond before timing out.
+
+
 ##### tags
 
 * _Optional_

@@ -1,8 +1,8 @@
-from distutils.core import setup
-setup(
+import setuptools
+setuptools.setup(
   name = 'logdna',
   packages = ['logdna'],
-  version = '1.2.7',
+  version = '1.2.8',
   description = 'A python package for sending logs to LogDNA',
   author = 'Answerbook Inc.',
   author_email = 'help@logdna.com',
