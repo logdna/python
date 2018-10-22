@@ -6,6 +6,7 @@ setuptools.setup(
   description = 'A python package for sending logs to LogDNA',
   author = 'Answerbook Inc.',
   author_email = 'help@logdna.com',
+  license = 'MIT',
   url = 'https://github.com/logdna/python',
   download_url = 'https://github.com/logdna/python/tarball/1.2.7',
   keywords = ['logdna', 'logging', 'logs', 'python', 'logdna.com', 'logger'],
