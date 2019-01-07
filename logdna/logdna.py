@@ -10,7 +10,7 @@ from threading import Timer
 logger = logging.getLogger(__name__)
 
 class LogDNAHandler(logging.Handler):
-    def __init__(self, key, options={}):
+    def __init__(self, key, options={}, url=None):
         self.buf = []
         self.secondary = []
         logging.Handler.__init__(self)
@@ -36,7 +36,10 @@ class LogDNAHandler(logging.Handler):
         if 'include_standard_meta' in options:
             self.include_standard_meta = options['include_standard_meta']
         self.flushLimit = defaults['FLUSH_BYTE_LIMIT']
-        self.url = defaults['LOGDNA_URL']
+        if url is not None:
+            self.url = url
+        else:
+            self.url = defaults['LOGDNA_URL']
         self.bufByteLength = 0
         self.flusher = None
         self.lock = threading.RLock()
