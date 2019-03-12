@@ -22,6 +22,7 @@ class LogDNAHandler(logging.Handler):
         self.app = options['app'] if 'app' in options else ''
         self.env = options['env'] if 'env' in options else ''
         self.setLevel(logging.DEBUG)
+        self.exceptionFlag = False
 
         self.tags = []
         if 'tags' in options and isinstance(options['tags'], list):
@@ -57,7 +58,7 @@ class LogDNAHandler(logging.Handler):
             self.secondary.append(message)
         else:
             self.buf.append(message)
-            self.lock.release();
+            self.lock.release()
             if self.bufByteLength >= self.flushLimit:
                 self.flush()
                 return
@@ -93,16 +94,21 @@ class LogDNAHandler(logging.Handler):
                 if self.flusher:
                     self.flusher.cancel()
                     self.flusher = None
-                self.lock.release();
+                self.lock.release()
                 # Ensure messages that could've dropped are appended back onto buf
-                self.buf = self.buf + self.secondary;
-                self.secondary = [];
+                self.buf = self.buf + self.secondary
+                self.secondary = []
         except requests.exceptions.RequestException as e:
             if self.flusher:
                 self.flusher.cancel()
                 self.flusher = None
-            self.lock.release();
-            logger.error('Error in request to LogDNA: ' + str(e))
+            self.lock.release()
+            if not self.exceptionFlag:
+                self.exceptionFlag = True
+                logger.error('Error in request to LogDNA: ' + str(e))
+        else:
+            # when no RequestException happened
+            self.exceptionFlag = False
 
     def isJSONable(self, obj):
         try:

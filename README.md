@@ -112,6 +112,7 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['logdna'],
+            'level': logging.DEBUG
         },
     },
 }
