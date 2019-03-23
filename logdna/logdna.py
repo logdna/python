@@ -37,7 +37,7 @@ class LogDNAHandler(logging.Handler):
         if 'include_standard_meta' in options:
             self.include_standard_meta = options['include_standard_meta']
         self.flushLimit = defaults['FLUSH_BYTE_LIMIT']
-        self.url = defaults['LOGDNA_URL']
+        self.url = options.get('url', defaults['LOGDNA_URL'])
         self.bufByteLength = 0
         self.flusher = None
         self.lock = threading.RLock()
@@ -79,7 +79,7 @@ class LogDNAHandler(logging.Handler):
                     self.flusher.start()
             else:
                 resp = requests.post(
-                    url=defaults['LOGDNA_URL'],
+                    url=self.url,
                     json=data,
                     auth=('user', self.key),
                     params={
