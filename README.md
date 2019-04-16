@@ -223,6 +223,13 @@ The amount of time the request should wait for LogDNA to respond before timing o
 
 List of tags used to dynamically group hosts.  More information on tags is available at [How Do I Use Host Tags?](https://docs.logdna.com/docs/logdna-agent#section-how-do-i-use-host-tags-)
 
+##### url
+
+* _Optional_
+* Type: `String`
+* Default: `'https://logs.logdna.com/logs/ingest'`
+
+The custom ingestion endpoint to stream the log lines into.
 
 ### log(line, [options])
 ---
