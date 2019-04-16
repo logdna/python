@@ -2,7 +2,7 @@ import setuptools
 setuptools.setup(
   name = 'logdna',
   packages = ['logdna'],
-  version = '1.2.9',
+  version = '1.3.0',
   description = 'A python package for sending logs to LogDNA',
   author = 'Answerbook Inc.',
   author_email = 'help@logdna.com',
