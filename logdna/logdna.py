@@ -21,6 +21,7 @@ class LogDNAHandler(logging.Handler):
         self.level = options['level'] if 'level' in options else 'info'
         self.app = options['app'] if 'app' in options else ''
         self.env = options['env'] if 'env' in options else ''
+        self.url = options['url'] if 'url' in options else defaults['LOGDNA_URL']
         self.setLevel(logging.DEBUG)
         self.exceptionFlag = False
 
@@ -37,7 +38,6 @@ class LogDNAHandler(logging.Handler):
         if 'include_standard_meta' in options:
             self.include_standard_meta = options['include_standard_meta']
         self.flushLimit = defaults['FLUSH_BYTE_LIMIT']
-        self.url = defaults['LOGDNA_URL']
         self.bufByteLength = 0
         self.flusher = None
         self.lock = threading.RLock()
@@ -79,7 +79,7 @@ class LogDNAHandler(logging.Handler):
                     self.flusher.start()
             else:
                 resp = requests.post(
-                    url=defaults['LOGDNA_URL'],
+                    url=self.url,
                     json=data,
                     auth=('user', self.key),
                     params={
