@@ -19,7 +19,7 @@ jobs:
       - run:
           name: Publish
           command: |
-            pip install twine
+            sudo pip install twine
             python setup.py dist
             twine upload dist/*.tar.gz
 workflows:
