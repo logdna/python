@@ -41,7 +41,7 @@ class LogDNAHandler(logging.Handler):
         self.bufByteLength = 0
         self.flusher = None
         self.lock = threading.RLock()
-        self.request_timeout = defaults['MAX_REQUEST_TIMEOUT']
+        self.request_timeout = defaults['DEFAULT_REQUEST_TIMEOUT']
         if 'request_timeout' in options:
             self.request_timeout = options['request_timeout']
 
