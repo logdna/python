@@ -1,6 +1,6 @@
 defaults = {
     'CONTENT_TYPE': 'application/json; charset=UTF-8',
-    'DEFAULT_REQUEST_TIMEOUT': 30000,
+    'DEFAULT_REQUEST_TIMEOUT': 30,
     'MS_IN_A_DAY': 86400000,
     'MAX_LINE_LENGTH': 32000,
     'MAX_INPUT_LENGTH': 32,
