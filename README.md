@@ -7,6 +7,8 @@
 
 ---
 
+[![CircleCI](https://circleci.com/gh/logdna/python/tree/master.svg?style=svg&circle-token=5b5c0dd0164b684cab6c78c535c5aeed30d613d4)](https://circleci.com/gh/logdna/python/tree/master)
+
 * **[Install](#install)**
 * **[Setup](#setup)**
 * **[Usage](#usage)**
@@ -196,6 +198,14 @@ If this option is turned to true then meta objects will be parsed and will be se
 
 The default level passed along with every log sent through this instance.
 
+##### verbose
+
+* _Optional_
+* Type: `String` or `Boolean`
+* Default: `true`
+* Values: False or any level
+
+The verbosity of the log statements in each failure.
 
 ##### max_length
 

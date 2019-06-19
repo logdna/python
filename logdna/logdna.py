@@ -19,6 +19,7 @@ class LogDNAHandler(logging.Handler):
         self.ip = options['ip'] if 'ip' in options else self.get_ip()
         self.mac = options['mac'] if 'mac' in options else None
         self.level = options['level'] if 'level' in options else 'info'
+        self.verbose = str(options['verbose']).lower() if 'verbose' in options else 'true'
         self.app = options['app'] if 'app' in options else ''
         self.env = options['env'] if 'env' in options else ''
         self.url = options['url'] if 'url' in options else defaults['LOGDNA_URL']
@@ -41,7 +42,7 @@ class LogDNAHandler(logging.Handler):
         self.bufByteLength = 0
         self.flusher = None
         self.lock = threading.RLock()
-        self.request_timeout = defaults['MAX_REQUEST_TIMEOUT']
+        self.request_timeout = defaults['DEFAULT_REQUEST_TIMEOUT']
         if 'request_timeout' in options:
             self.request_timeout = options['request_timeout']
 
@@ -49,7 +50,8 @@ class LogDNAHandler(logging.Handler):
         if message and message['line']:
             if self.max_length and len(message['line']) > defaults['MAX_LINE_LENGTH']:
                 message['line'] = message['line'][:defaults['MAX_LINE_LENGTH']] + ' (cut off, too long...)'
-                logger.debug('Line was longer than ' + str(defaults['MAX_LINE_LENGTH']) + ' chars and was truncated.')
+                if self.verbose in ['true', 'debug', 'd']:
+                    logger.debug('Line was longer than ' + str(defaults['MAX_LINE_LENGTH']) + ' chars and was truncated.')
 
         self.bufByteLength += sys.getsizeof(message)
 
@@ -105,7 +107,8 @@ class LogDNAHandler(logging.Handler):
             self.lock.release()
             if not self.exceptionFlag:
                 self.exceptionFlag = True
-                logger.error('Error in request to LogDNA: ' + str(e))
+                if self.verbose in ['true', 'error', 'err', 'e']:
+                    logger.error('Error in request to LogDNA: ' + str(e))
         else:
             # when no RequestException happened
             self.exceptionFlag = False
