@@ -5,6 +5,8 @@ import logging
 import socket
 import threading
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
 from .configs import defaults
 from .utils import sanitize_meta
 from .utils import get_ip
@@ -23,6 +25,8 @@ class LogDNAHandler(logging.Handler):
         self.buf_byte_length = 0
         self.flusher = None
         self.max_length = defaults['MAX_LINE_LENGTH']
+        self.connection_retries = 5
+        self.retry_backoff_factor = 0.5
 
         self.hostname = get_option(options, 'hostname', socket.gethostname())
         self.ip = get_option(options, 'ip', get_ip())
@@ -41,12 +45,17 @@ class LogDNAHandler(logging.Handler):
 
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
-        elif not isinstance(options['tags'], list):
+        elif not isinstance(self.tags, list):
             self.tags = []
 
 
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
+
+        self.session = requests.Session()
+        retry = Retry(connect=self.connection_retries, backoff_factor=self.retry_backoff_factor)
+        adapter = HTTPAdapter(max_retries=retry)
+        self.session.mount('https://', adapter)
 
     def buffer_log(self, message):
         if message and message['line']:
@@ -82,7 +91,7 @@ class LogDNAHandler(logging.Handler):
                     self.flusher = threading.Timer(1, self.flush)
                     self.flusher.start()
             else:
-                requests.post(
+                self.session.post(
                     url=self.url,
                     json=data,
                     auth=('user', self.key),
