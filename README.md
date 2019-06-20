@@ -205,15 +205,6 @@ The default level passed along with every log sent through this instance.
 
 The verbosity of the log statements in each failure.
 
-##### max_length
-
-* _Optional_
-* Type: `Boolean`
-* Default: `True`
-
-By default the line has a maximum length of 16000 chars, this can be turned off with the value false.
-
-
 ##### request_timeout
 
 * _Optional_
