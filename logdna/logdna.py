@@ -8,9 +8,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
 from .configs import defaults
-from .utils import sanitize_meta
-from .utils import get_ip
-from .utils import get_option
+from .utils import sanitize_meta, get_ip
 
 logger = logging.getLogger(__name__)
 
@@ -28,20 +26,20 @@ class LogDNAHandler(logging.Handler):
         self.connection_retries = 5
         self.retry_backoff_factor = 0.5
 
-        self.hostname = get_option(options, 'hostname', socket.gethostname())
-        self.ip = get_option(options, 'ip', get_ip())
-        self.mac = get_option(options, 'mac')
-        self.level = get_option(options, 'level', 'info')
-        self.verbose = str(get_option(options, 'verbose', 'true')).lower()
-        self.app = get_option(options, 'app', '')
-        self.env = get_option(options, 'env', '')
-        self.url = get_option(options, 'url', defaults['LOGDNA_URL'])
-        self.request_timeout = get_option(options, 'request_timeout', defaults['DEFAULT_REQUEST_TIMEOUT'])
-        self.include_standard_meta = get_option(options, 'include_standard_meta', False)
-        self.index_meta = get_option(options, 'index_meta', False)
-        self.flush_limit = get_option(options, 'flush_limit', defaults['FLUSH_BYTE_LIMIT'])
-        self.flush_interval = get_option(options, 'flush_interval', defaults['FLUSH_INTERVAL'])
-        self.tags = get_option(options, 'tags', [])
+        self.hostname = options.get('hostname', socket.gethostname())
+        self.ip = options.get('ip', get_ip())
+        self.mac = options.get('mac', None)
+        self.level = options.get('level', 'info')
+        self.verbose = str(options.get('verbose', 'true')).lower()
+        self.app = options.get('app', '')
+        self.env = options.get('env', '')
+        self.url = options.get('url', defaults['LOGDNA_URL'])
+        self.request_timeout = options.get('request_timeout', defaults['DEFAULT_REQUEST_TIMEOUT'])
+        self.include_standard_meta = options.get('include_standard_meta', False)
+        self.index_meta = options.get('index_meta', False)
+        self.flush_limit = options.get('flush_limit', defaults['FLUSH_BYTE_LIMIT'])
+        self.flush_interval = options.get('flush_interval', defaults['FLUSH_INTERVAL'])
+        self.tags = options.get('tags', [])
 
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]

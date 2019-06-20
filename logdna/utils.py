@@ -30,8 +30,3 @@ def get_ip():
     finally:
         s.close()
     return ip
-
-def get_option(options, key, default=None):
-    if key in options:
-        return options[key]
-    return default
