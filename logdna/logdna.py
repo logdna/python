@@ -1,59 +1,68 @@
 import sys
 import time
 import json
-from .configs import defaults
 import logging
-import requests
-import threading
 import socket
-from threading import Timer
+import threading
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util import Retry
+from .configs import defaults
+from .utils import sanitize_meta, get_ip
+
 logger = logging.getLogger(__name__)
 
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
+        logging.Handler.__init__(self)
+
+        self.key = key
         self.buf = []
         self.secondary = []
-        logging.Handler.__init__(self)
-        self.key = key
-        self.hostname = options['hostname'] if 'hostname' in options else socket.gethostname()
-        self.ip = options['ip'] if 'ip' in options else self.get_ip()
-        self.mac = options['mac'] if 'mac' in options else None
-        self.level = options['level'] if 'level' in options else 'info'
-        self.verbose = str(options['verbose']).lower() if 'verbose' in options else 'true'
-        self.app = options['app'] if 'app' in options else ''
-        self.env = options['env'] if 'env' in options else ''
-        self.url = options['url'] if 'url' in options else defaults['LOGDNA_URL']
-        self.setLevel(logging.DEBUG)
-        self.exceptionFlag = False
-
-        self.tags = []
-        if 'tags' in options and isinstance(options['tags'], list):
-            self.tags.extend(options['tags'])
-        self.max_length = True
-        if 'max_length' in options:
-            self.max_length = options['max_length']
-        self.index_meta = False
-        if 'index_meta' in options:
-            self.index_meta = options['index_meta']
-        self.include_standard_meta = False
-        if 'include_standard_meta' in options:
-            self.include_standard_meta = options['include_standard_meta']
-        self.flushLimit = defaults['FLUSH_BYTE_LIMIT']
-        self.bufByteLength = 0
+        self.exception_flag = False
+        self.buf_byte_length = 0
         self.flusher = None
+        self.max_length = defaults['MAX_LINE_LENGTH']
+        self.connection_retries = 5
+        self.retry_backoff_factor = 0.5
+
+        self.hostname = options.get('hostname', socket.gethostname())
+        self.ip = options.get('ip', get_ip())
+        self.mac = options.get('mac', None)
+        self.level = options.get('level', 'info')
+        self.verbose = str(options.get('verbose', 'true')).lower()
+        self.app = options.get('app', '')
+        self.env = options.get('env', '')
+        self.url = options.get('url', defaults['LOGDNA_URL'])
+        self.request_timeout = options.get('request_timeout', defaults['DEFAULT_REQUEST_TIMEOUT'])
+        self.include_standard_meta = options.get('include_standard_meta', False)
+        self.index_meta = options.get('index_meta', False)
+        self.flush_limit = options.get('flush_limit', defaults['FLUSH_BYTE_LIMIT'])
+        self.flush_interval = options.get('flush_interval', defaults['FLUSH_INTERVAL'])
+        self.tags = options.get('tags', [])
+
+        if isinstance(self.tags, str):
+            self.tags = [tag.strip() for tag in self.tags.split(',')]
+        elif not isinstance(self.tags, list):
+            self.tags = []
+
+
+        self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
-        self.request_timeout = defaults['DEFAULT_REQUEST_TIMEOUT']
-        if 'request_timeout' in options:
-            self.request_timeout = options['request_timeout']
 
-    def bufferLog(self, message):
+        self.session = requests.Session()
+        retry = Retry(connect=self.connection_retries, backoff_factor=self.retry_backoff_factor)
+        adapter = HTTPAdapter(max_retries=retry)
+        self.session.mount('https://', adapter)
+
+    def buffer_log(self, message):
         if message and message['line']:
-            if self.max_length and len(message['line']) > defaults['MAX_LINE_LENGTH']:
-                message['line'] = message['line'][:defaults['MAX_LINE_LENGTH']] + ' (cut off, too long...)'
+            if len(message['line']) > self.max_length:
+                message['line'] = message['line'][:self.max_length] + ' (cut off, too long...)'
                 if self.verbose in ['true', 'debug', 'd']:
-                    logger.debug('Line was longer than ' + str(defaults['MAX_LINE_LENGTH']) + ' chars and was truncated.')
+                    logger.debug('Line was longer than %s chars and was truncated.', str(self.max_length))
 
-        self.bufByteLength += sys.getsizeof(message)
+        self.buf_byte_length += sys.getsizeof(message)
 
         # Attempt to acquire lock to write to buf, otherwise write to secondary as flush occurs
         if not self.lock.acquire(blocking=False):
@@ -61,12 +70,12 @@ class LogDNAHandler(logging.Handler):
         else:
             self.buf.append(message)
             self.lock.release()
-            if self.bufByteLength >= self.flushLimit:
+            if self.buf_byte_length >= self.flush_limit:
                 self.flush()
                 return
 
         if not self.flusher:
-            self.flusher = Timer(defaults['FLUSH_INTERVAL'], self.flush)
+            self.flusher = threading.Timer(self.flush_interval, self.flush)
             self.flusher.start()
 
     def flush(self):
@@ -77,10 +86,10 @@ class LogDNAHandler(logging.Handler):
             # Ensure we have the lock when flushing
             if not self.lock.acquire(blocking=False):
                 if not self.flusher:
-                    self.flusher = Timer(defaults['FLUSH_NOW'], self.flush)
+                    self.flusher = threading.Timer(1, self.flush)
                     self.flusher.start()
             else:
-                resp = requests.post(
+                self.session.post(
                     url=self.url,
                     json=data,
                     auth=('user', self.key),
@@ -92,7 +101,7 @@ class LogDNAHandler(logging.Handler):
                     stream=True,
                     timeout=self.request_timeout)
                 self.buf = []
-                self.bufByteLength = 0
+                self.buf_byte_length = 0
                 if self.flusher:
                     self.flusher.cancel()
                     self.flusher = None
@@ -105,31 +114,13 @@ class LogDNAHandler(logging.Handler):
                 self.flusher.cancel()
                 self.flusher = None
             self.lock.release()
-            if not self.exceptionFlag:
-                self.exceptionFlag = True
+            if not self.exception_flag:
+                self.exception_flag = True
                 if self.verbose in ['true', 'error', 'err', 'e']:
-                    logger.error('Error in request to LogDNA: ' + str(e))
+                    logger.error('Error in Request to LogDNA: %s', str(e))
         else:
             # when no RequestException happened
-            self.exceptionFlag = False
-
-    def isJSONable(self, obj):
-        try:
-            json.dumps(obj)
-            return True
-        except:
-            return False
-
-    def sanitizeMeta(self, meta):
-        keysToSanitize = []
-        for key,value in meta.items():
-            if not self.isJSONable(value):
-                keysToSanitize.append(key)
-        if keysToSanitize:
-            for key in keysToSanitize:
-                del meta[key]
-            meta['__errors'] = 'These keys have been sanitized: ' + ', '.join(keysToSanitize)
-        return meta
+            self.exception_flag = False
 
     def emit(self, record):
         msg = self.format(record)
@@ -166,23 +157,11 @@ class LogDNAHandler(logging.Handler):
                 message['timestamp'] = opts['timestamp']
             if 'meta' in opts:
                 if self.index_meta:
-                    message['meta'] = self.sanitizeMeta(opts['meta'])
+                    message['meta'] = sanitize_meta(opts['meta'])
                 else:
                     message['meta'] = json.dumps(opts['meta'])
 
-        self.bufferLog(message)
-
-    def get_ip(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        try:
-            # doesn't even have to be reachable
-            s.connect(('10.255.255.255', 1))
-            IP = s.getsockname()[0]
-        except:
-            IP = '127.0.0.1'
-        finally:
-            s.close()
-        return IP
+        self.buffer_log(message)
 
     def close(self):
         """
