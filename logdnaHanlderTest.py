@@ -7,11 +7,6 @@ import json
 import concurrent.futures
 import time
 
-
-'''
-For now I suggest running the test methods separatley by commenting out
-all except one. This will gourantee the test correctness.
-'''
 key = '< YOUR INGESTION KEY HERE >'
 log = logging.getLogger('logdna')
 log.setLevel(logging.INFO)
