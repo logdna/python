@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
         logging.Handler.__init__(self)
-
         self.key = key
         self.buf = []
         self.secondary = []
@@ -23,7 +22,7 @@ class LogDNAHandler(logging.Handler):
         self.buf_byte_length = 0
         self.flusher = None
         self.max_length = defaults['MAX_LINE_LENGTH']
-        self.connection_retries = 5
+        self.connection_retries = 1
         self.retry_backoff_factor = 0.5
 
         self.hostname = options.get('hostname', socket.gethostname())
@@ -49,11 +48,6 @@ class LogDNAHandler(logging.Handler):
 
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
-
-        self.session = requests.Session()
-        retry = Retry(connect=self.connection_retries, backoff_factor=self.retry_backoff_factor)
-        adapter = HTTPAdapter(max_retries=retry)
-        self.session.mount('https://', adapter)
 
     def buffer_log(self, message):
         if message and message['line']:
@@ -89,7 +83,7 @@ class LogDNAHandler(logging.Handler):
                     self.flusher = threading.Timer(1, self.flush)
                     self.flusher.start()
             else:
-                self.session.post(
+                res = requests.post(
                     url=self.url,
                     json=data,
                     auth=('user', self.key),
@@ -100,27 +94,27 @@ class LogDNAHandler(logging.Handler):
                         'tags': self.tags if self.tags else None},
                     stream=True,
                     timeout=self.request_timeout)
+                res.raise_for_status()
+                # when no RequestException happened
+                self.exception_flag = False
                 self.buf = []
                 self.buf_byte_length = 0
                 if self.flusher:
                     self.flusher.cancel()
                     self.flusher = None
-                self.lock.release()
                 # Ensure messages that could've dropped are appended back onto buf
                 self.buf = self.buf + self.secondary
                 self.secondary = []
+                self.lock.release()
         except requests.exceptions.RequestException as e:
             if self.flusher:
                 self.flusher.cancel()
                 self.flusher = None
+
             self.lock.release()
-            if not self.exception_flag:
-                self.exception_flag = True
-                if self.verbose in ['true', 'error', 'err', 'e']:
-                    logger.error('Error in Request to LogDNA: %s', str(e))
-        else:
-            # when no RequestException happened
-            self.exception_flag = False
+            self.exception_flag = True
+            if self.verbose in ['true', 'error', 'err', 'e']:
+                print('Vilya Vilya', str(e))
 
     def emit(self, record):
         msg = self.format(record)
@@ -135,7 +129,6 @@ class LogDNAHandler(logging.Handler):
                 opts['meta'] = {}
             for key in ['name', 'pathname', 'lineno']:
                 opts['meta'][key] = record[key]
-
         message = {
             'hostname': self.hostname,
             'timestamp': int(time.time() * 1000),
@@ -160,16 +153,16 @@ class LogDNAHandler(logging.Handler):
                     message['meta'] = sanitize_meta(opts['meta'])
                 else:
                     message['meta'] = json.dumps(opts['meta'])
-
         self.buffer_log(message)
 
     def close(self):
+        print("close")
         """
         Close the log handler.
 
         Make sure that the log handler has attempted to flush the log buffer before closing.
         """
-        try:
+        if self.exception_flag == False and len(self.buf) > 0:
             self.flush()
-        finally:
-            logging.Handler.close(self)
+
+        logging.Handler.close(self)
