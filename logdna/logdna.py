@@ -18,6 +18,7 @@ logger.addHandler(internal_handler)
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
         logging.Handler.__init__(self)
+
         self.key = key
         self.buf = []
         self.secondary = []
@@ -81,7 +82,6 @@ class LogDNAHandler(logging.Handler):
             self.flusher.start()
 
     def flush(self):
-        logger.debug("intersting ")
         if not self.buf or len(self.buf) < 0:
             return
         data = {'e': 'ls', 'ls': self.buf}
@@ -138,6 +138,7 @@ class LogDNAHandler(logging.Handler):
                 opts['meta'] = {}
             for key in ['name', 'pathname', 'lineno']:
                 opts['meta'][key] = record[key]
+
         message = {
             'hostname': self.hostname,
             'timestamp': int(time.time() * 1000),
@@ -165,7 +166,6 @@ class LogDNAHandler(logging.Handler):
         self.buffer_log(message)
 
     def close(self):
-        print("close")
         """
         Close the log handler.
 
@@ -173,5 +173,4 @@ class LogDNAHandler(logging.Handler):
         """
         if self.exception_flag == False and len(self.buf) > 0:
             self.flush()
-        logger.debug("closings")
         logging.Handler.close(self)
