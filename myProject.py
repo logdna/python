@@ -1,7 +1,7 @@
 import logging
 from logdna import LogDNAHandler
 
-key = 'd8e14421399a44a9a35dfc49c7f5f0aa'
+key = 'ab37921179dccd5eb6ed9898b9ef8f54'
 
 log = logging.getLogger('logdna')
 log.setLevel(logging.INFO)
@@ -16,5 +16,5 @@ test = LogDNAHandler(key, options)
 
 log.addHandler(test)
 
-log.warn("message message python python", {'app': 'bloop'})
-log.info("python python python")
+log.warn("Despite all the admiration", {'app': 'bloop'})
+log.info("Saint Francis preacing to the birds")

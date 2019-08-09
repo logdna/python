@@ -11,6 +11,9 @@ from .configs import defaults
 from .utils import sanitize_meta, get_ip
 
 logger = logging.getLogger(__name__)
+internal_handler = logging.FileHandler('LogDNAHandler.log')
+internal_handler.setLevel(logging.DEBUG)
+logger.addHandler(internal_handler)
 
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
@@ -22,7 +25,6 @@ class LogDNAHandler(logging.Handler):
         self.buf_byte_length = 0
         self.flusher = None
         self.max_length = defaults['MAX_LINE_LENGTH']
-        self.connection_retries = 1
         self.retry_backoff_factor = 0.5
 
         self.hostname = options.get('hostname', socket.gethostname())
@@ -39,6 +41,7 @@ class LogDNAHandler(logging.Handler):
         self.flush_limit = options.get('flush_limit', defaults['FLUSH_BYTE_LIMIT'])
         self.flush_interval = options.get('flush_interval', defaults['FLUSH_INTERVAL'])
         self.tags = options.get('tags', [])
+        self.buf_size_limit = options.get('buf_retention_limit', defaults['BUFFER_BYTE_LIMIT'])
 
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
@@ -56,13 +59,18 @@ class LogDNAHandler(logging.Handler):
                 if self.verbose in ['true', 'debug', 'd']:
                     logger.debug('Line was longer than %s chars and was truncated.', str(self.max_length))
 
-        self.buf_byte_length += sys.getsizeof(message)
+
 
         # Attempt to acquire lock to write to buf, otherwise write to secondary as flush occurs
         if not self.lock.acquire(blocking=False):
             self.secondary.append(message)
         else:
-            self.buf.append(message)
+            if self.buf_byte_length < self.buf_size_limit:
+                self.buf_byte_length += sys.getsizeof(message)
+                self.buf.append(message)
+            else:
+                logger.debug('The buffer size exceeded the limit: ', str(self.buf_size_limit))
+
             self.lock.release()
             if self.buf_byte_length >= self.flush_limit:
                 self.flush()
@@ -73,6 +81,7 @@ class LogDNAHandler(logging.Handler):
             self.flusher.start()
 
     def flush(self):
+        logger.debug("intersting ")
         if not self.buf or len(self.buf) < 0:
             return
         data = {'e': 'ls', 'ls': self.buf}
@@ -114,7 +123,7 @@ class LogDNAHandler(logging.Handler):
             self.lock.release()
             self.exception_flag = True
             if self.verbose in ['true', 'error', 'err', 'e']:
-                print('Vilya Vilya', str(e))
+                logger.debug('Error happened while trying to send the logs')
 
     def emit(self, record):
         msg = self.format(record)
@@ -164,5 +173,5 @@ class LogDNAHandler(logging.Handler):
         """
         if self.exception_flag == False and len(self.buf) > 0:
             self.flush()
-
+        logger.debug("closings")
         logging.Handler.close(self)
