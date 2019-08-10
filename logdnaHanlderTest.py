@@ -7,6 +7,8 @@ import json
 import concurrent.futures
 import time
 
+current_milli_time = lambda: int(round(time.time() * 1000))
+
 key = '< YOUR INGESTION KEY HERE >'
 log = logging.getLogger('logdna')
 log.setLevel(logging.INFO)
@@ -36,9 +38,7 @@ class failed_RequestHandler(BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         self.send_response(400)
-
         self.end_headers()
-
 
 class LogDNAHandlerTest(unittest.TestCase):
     def serverRecievesMessages(self):
@@ -83,7 +83,6 @@ class LogDNAHandlerTest(unittest.TestCase):
           'mac': 'C0:FF:EE:C0:FF:EE'
         }
         server_address = ('localhost', 8080)
-
         httpd = HTTPServer(server_address, failed_RequestHandler)
 
         failedCaseLogger = LogDNAHandler(key, options)
@@ -92,7 +91,6 @@ class LogDNAHandlerTest(unittest.TestCase):
 
         def send_log_to_fail():
             log.info(line)
-
 
         serverThread = threading.Thread(target=httpd.handle_request)
         logdnaThread = threading.Thread(target=send_log_to_fail)
@@ -104,7 +102,6 @@ class LogDNAHandlerTest(unittest.TestCase):
 
         serverThread.join()
         logdnaThread.join()
-
         self.assertTrue(len(failedCaseLogger.buf) == 1)
 
 

@@ -41,6 +41,7 @@ class LogDNAHandler(logging.Handler):
         self.index_meta = options.get('index_meta', False)
         self.flush_limit = options.get('flush_limit', defaults['FLUSH_BYTE_LIMIT'])
         self.flush_interval = options.get('flush_interval', defaults['FLUSH_INTERVAL'])
+        self.backoff_period = options.get('backoff_period', defaults['BACKOFF_PERIOD'])
         self.tags = options.get('tags', [])
         self.buf_size_limit = options.get('buf_retention_limit', defaults['BUFFER_BYTE_LIMIT'])
 
@@ -78,7 +79,8 @@ class LogDNAHandler(logging.Handler):
                 return
 
         if not self.flusher:
-            self.flusher = threading.Timer(self.flush_interval, self.flush)
+            interval = self.backoff_period if self.exception_flag == True else self.flush_interval
+            self.flusher = threading.Timer(interval, self.flush)
             self.flusher.start()
 
     def flush(self):
