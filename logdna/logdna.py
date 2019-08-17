@@ -71,7 +71,7 @@ class LogDNAHandler(logging.Handler):
                 self.buf_byte_length += sys.getsizeof(message)
                 self.buf.append(message)
             else:
-                logger.debug('The buffer size exceeded the limit: ', str(self.buf_size_limit))
+                logger.debug('The buffer size exceeded the limit: %s', str(self.buf_size_limit))
 
             self.lock.release()
             if self.buf_byte_length >= self.flush_limit:
