@@ -59,7 +59,7 @@ class LogDNAHandler(logging.Handler):
             if len(message['line']) > self.max_length:
                 message['line'] = message['line'][:self.max_length] + ' (cut off, too long...)'
                 if self.verbose in ['true', 'debug', 'd']:
-                    logger.debug('Line was longer than %s chars and was truncated.', str(self.max_length))
+                    print(f'Line was longer than {self.max_length} chars and was truncated.')
 
 
 
@@ -71,7 +71,7 @@ class LogDNAHandler(logging.Handler):
                 self.buf_byte_length += sys.getsizeof(message)
                 self.buf.append(message)
             else:
-                logger.debug('The buffer size exceeded the limit: %s', str(self.buf_size_limit))
+                print(f'The buffer size exceeded the limit: {self.buf_size_limit}')
 
             self.lock.release()
             if self.buf_byte_length >= self.flush_limit:
@@ -125,7 +125,7 @@ class LogDNAHandler(logging.Handler):
             self.lock.release()
             self.exception_flag = True
             if self.verbose in ['true', 'error', 'err', 'e']:
-                logger.debug('Error happened while trying to send the logs')
+                print('Error happened while trying to send the logs')
 
     def emit(self, record):
         msg = self.format(record)
