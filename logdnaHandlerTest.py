@@ -1,11 +1,13 @@
+import concurrent.futures
+import json
+import threading
+import time
+
 from http.server import BaseHTTPRequestHandler,HTTPServer
 import logging
-import threading
-from logdna import LogDNAHandler
 import unittest
-import json
-import concurrent.futures
-import time
+
+from logdna import LogDNAHandler
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -29,7 +31,6 @@ class successful_RequestHandler(BaseHTTPRequestHandler):
 
         self.end_headers()
         body = json.loads(body)['ls']
-
         for keys in body:
             expectedLines.append(keys['line'])
 
@@ -105,7 +106,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         self.assertTrue(len(failedCaseLogger.buf) == 1)
 
 
-    def stopps_retention_when_buf_is_full(self):
+    def stops_retention_when_buf_is_full(self):
         options = {
           'hostname': 'localhost',
           'url': 'http://localhost:1337',
@@ -144,7 +145,7 @@ class LogDNAHandlerTest(unittest.TestCase):
     def test_run_tests(self):
         self.serverRecievesMessages()
         self.messagesPreservedIfExcp()
-        self.stopps_retention_when_buf_is_full()
+        self.stops_retention_when_buf_is_full()
 
 
 if __name__ == '__main__':

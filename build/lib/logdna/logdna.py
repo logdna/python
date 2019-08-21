@@ -1,14 +1,12 @@
+import sys
+import time
 import json
 import logging
-import requests
 import socket
-import sys
 import threading
-import time
-
+import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
-
 from .configs import defaults
 from .utils import sanitize_meta, get_ip
 
@@ -85,7 +83,7 @@ class LogDNAHandler(logging.Handler):
                 return
 
         if not self.flusher:
-            interval = self.RETRY_INTERVAL_SECS if self.failed_lines_byte_size == 0 else self.flush_interval
+            interval = self.RETRY_INTERVAL_SECS if self.exception_flag == True else self.flush_interval
             self.flusher = threading.Timer(interval, self.flush)
             self.flusher.start()
 
@@ -127,7 +125,7 @@ class LogDNAHandler(logging.Handler):
             self.exception_flag = True
             self.failed_lines_byte_size = self.buf_byte_length
             if self.verbose in ['true', 'error', 'err', 'e']:
-                internalLogger.debug('Error sending logs %s', e)
+                internalLogger.debug('Error happened while trying to send the logs')
         self.buf_byte_length = 0
         self.lock.release()
 
@@ -177,6 +175,6 @@ class LogDNAHandler(logging.Handler):
 
         Make sure that the log handler has attempted to flush the log buffer before closing.
         """
-        if self.failed_lines_byte_size == 0 and len(self.buf) > 0:
+        if self.exception_flag == False and len(self.buf) > 0:
             self.flush()
         logging.Handler.close(self)
