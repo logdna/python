@@ -125,7 +125,7 @@ class LogDNAHandler(logging.Handler):
             self.exception_flag = True
             self.failed_lines_byte_size = self.buf_byte_length
             if self.verbose in ['true', 'error', 'err', 'e']:
-                internalLogger.debug('Error happened while trying to send the logs')
+                internalLogger.debug('Error sending logs')
         self.buf_byte_length = 0
         self.lock.release()
 
