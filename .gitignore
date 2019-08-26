@@ -1,6 +1,8 @@
 **/*.pyc
 **/*cache*
-./build/*
-./dist/*
-./logdna.egg-info/*
+develop-eggs
+dist
+src/*.egg-info
 LogDNAHandler.log
+bin
+.installed.cfg
