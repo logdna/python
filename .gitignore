@@ -1,3 +1,6 @@
 **/*.pyc
 **/*cache*
+./build/*
+./dist/*
+./logdna.egg-info/*
 LogDNAHandler.log
