@@ -4,6 +4,7 @@ build/
 develop-eggs
 dist
 src/*.egg-info
+logdna.egg-info/
 LogDNAHandler.log
 bin
 .installed.cfg

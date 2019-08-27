@@ -45,10 +45,10 @@ class LogDNAHandler(logging.Handler):
         self.index_meta = options.get('index_meta', False)
         self.flush_limit = options.get('flush_limit', defaults['FLUSH_BYTE_LIMIT'])
         self.flush_interval = options.get('flush_interval', defaults['FLUSH_INTERVAL'])
-        self.RETRY_INTERVAL_SECS = options.get('RETRY_INTERVAL_SECS', defaults['RETRY_INTERVAL_SECS'])
+        self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
-        self.buf_retention_limit = options.get('buf_retention_limit', defaults['BUFFER_RETENTION_LIMIT'])
-        self.failed_lines_byte_size = 0
+        self.buf_retention_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_LIMIT'])
+        self.exception_flag = False
 
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
@@ -72,7 +72,7 @@ class LogDNAHandler(logging.Handler):
         if not self.lock.acquire(blocking=False):
             self.secondary.append(message)
         else:
-            if self.buf_byte_length + self.failed_lines_byte_size < self.buf_retention_limit:
+            if self.buf_byte_length < self.buf_retention_limit:
                 self.buf_byte_length += sys.getsizeof(message)
                 self.buf.append(message)
             else:
@@ -80,12 +80,12 @@ class LogDNAHandler(logging.Handler):
 
             self.lock.release()
 
-            if self.buf_byte_length >= self.flush_limit and self.failed_lines_byte_size == 0:
+            if self.buf_byte_length >= self.flush_limit and self.exception_flag == False:
                 self.flush()
                 return
 
         if not self.flusher:
-            interval = self.RETRY_INTERVAL_SECS if self.failed_lines_byte_size == 0 else self.flush_interval
+            interval = self.retry_interval_secs if self.exception_flag == True else self.flush_interval
             self.flusher = threading.Timer(interval, self.flush)
             self.flusher.start()
 
@@ -116,7 +116,8 @@ class LogDNAHandler(logging.Handler):
                 # when no RequestException happened
                 self.buf = []
                 self.secondary = []
-                self.failed_lines_byte_size = 0
+                self.exception_flag = False
+                self.buf_byte_length = 0
                 if self.flusher:
                     self.flusher.cancel()
                     self.flusher = None
@@ -125,10 +126,8 @@ class LogDNAHandler(logging.Handler):
                 self.flusher.cancel()
                 self.flusher = None
             self.exception_flag = True
-            self.failed_lines_byte_size = self.buf_byte_length
             if self.verbose in ['true', 'error', 'err', 'e']:
                 internalLogger.debug('Error sending logs %s', e)
-        self.buf_byte_length = 0
         self.lock.release()
 
     def emit(self, record):
@@ -171,12 +170,12 @@ class LogDNAHandler(logging.Handler):
                     message['meta'] = json.dumps(opts['meta'])
         self.buffer_log(message)
 
-    def close(self):
-        """
-        Close the log handler.
-
-        Make sure that the log handler has attempted to flush the log buffer before closing.
-        """
-        if self.failed_lines_byte_size == 0 and len(self.buf) > 0:
-            self.flush()
-        logging.Handler.close(self)
+    # def close(self):
+    #     """
+    #     Close the log handler.
+    #
+    #     Make sure that the log handler has attempted to flush the log buffer before closing.
+    #     """
+    #     if self.exception_flag == False and len(self.buf) > 0:
+    #         self.flush()
+    #     logging.Handler.close(self)

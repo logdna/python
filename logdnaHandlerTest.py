@@ -42,7 +42,7 @@ class failed_RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
 class LogDNAHandlerTest(unittest.TestCase):
-    def serverRecievesMessages(self):
+    def server_recieves_messages(self):
         options = {
           'hostname': 'localhost',
           'url': 'http://localhost:8081',
@@ -76,7 +76,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         self.assertTrue(len(test.buf) == 0)
         self.assertTrue(line in expectedLines)
 
-    def messagesPreservedIfExcp(self):
+    def messages_preserved_if_excp(self):
         options = {
           'hostname': 'localhost',
           'url': 'http://localhost:8080',
@@ -103,7 +103,7 @@ class LogDNAHandlerTest(unittest.TestCase):
 
         serverThread.join()
         logdnaThread.join()
-        self.assertTrue(len(failedCaseLogger.buf) == 1)
+        self.assertEqual(len(failedCaseLogger.buf), 1)
 
 
     def stops_retention_when_buf_is_full(self):
@@ -139,12 +139,12 @@ class LogDNAHandlerTest(unittest.TestCase):
 
         serverThread.join()
         logdnaThread.join()
-        self.assertTrue(len(failedCaseLogger.buf) == 1)
-        self.assertFalse(failedCaseLogger.buf[0]['line'] == lineTwo)
+        self.assertEqual(len(failedCaseLogger.buf), 1)
+        self.assertNotEqual(failedCaseLogger.buf[0]['line'], lineTwo)
 
     def test_run_tests(self):
-        self.serverRecievesMessages()
-        self.messagesPreservedIfExcp()
+        self.server_recieves_messages()
+        self.messages_preserved_if_excp()
         self.stops_retention_when_buf_is_full()
 
 
