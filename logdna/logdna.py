@@ -12,16 +12,15 @@ from urllib3.util import Retry
 from .configs import defaults
 from .utils import sanitize_meta, get_ip
 
-internalHandler = logging.StreamHandler(sys.stdout)
-internalHandler.setLevel(logging.DEBUG)
-
-internalLogger = logging.getLogger('internal')
-internalLogger.setLevel(logging.DEBUG)
-internalLogger.addHandler(internalHandler)
-
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
         logging.Handler.__init__(self)
+
+        self.internalHandler = logging.StreamHandler(sys.stdout)
+        self.internalHandler.setLevel(logging.DEBUG)
+        self.internalLogger = logging.getLogger('internal')
+        self.internalLogger.setLevel(logging.DEBUG)
+        self.internalLogger.addHandler(self.internalHandler)
 
         self.key = key
         self.buf = []
@@ -54,8 +53,6 @@ class LogDNAHandler(logging.Handler):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
         elif not isinstance(self.tags, list):
             self.tags = []
-
-
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
 
@@ -64,9 +61,7 @@ class LogDNAHandler(logging.Handler):
             if len(message['line']) > self.max_length:
                 message['line'] = message['line'][:self.max_length] + ' (cut off, too long...)'
                 if self.verbose in ['true', 'debug', 'd']:
-                    internalLogger.debug('Line was longer than %s chars and was truncated.', self.max_length)
-
-
+                    self.internalLogger.debug('Line was longer than %s chars and was truncated.', self.max_length)
 
         # Attempt to acquire lock to write to buf, otherwise write to secondary as flush occurs
         if not self.lock.acquire(blocking=False):
@@ -76,7 +71,7 @@ class LogDNAHandler(logging.Handler):
                 self.buf_byte_length += sys.getsizeof(message)
                 self.buf.append(message)
             else:
-                internalLogger.debug('The buffer size exceeded the limit: %s', self.buf_retention_limit)
+                self.internalLogger.debug('The buffer size exceeded the limit: %s', self.buf_retention_limit)
 
             self.lock.release()
 
@@ -127,7 +122,7 @@ class LogDNAHandler(logging.Handler):
                 self.flusher = None
             self.exception_flag = True
             if self.verbose in ['true', 'error', 'err', 'e']:
-                internalLogger.debug('Error sending logs %s', e)
+                self.internalLogger.debug('Error sending logs %s', e)
         self.lock.release()
 
     def emit(self, record):
@@ -170,12 +165,12 @@ class LogDNAHandler(logging.Handler):
                     message['meta'] = json.dumps(opts['meta'])
         self.buffer_log(message)
 
-    # def close(self):
-    #     """
-    #     Close the log handler.
-    #
-    #     Make sure that the log handler has attempted to flush the log buffer before closing.
-    #     """
-    #     if self.exception_flag == False and len(self.buf) > 0:
-    #         self.flush()
-    #     logging.Handler.close(self)
+    def close(self):
+        """
+        Close the log handler.
+
+        Make sure that the log handler has attempted to flush the log buffer before closing.
+        """
+        if self.exception_flag == False and len(self.buf) > 0:
+            self.flush()
+        logging.Handler.close(self)
