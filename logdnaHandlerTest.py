@@ -72,9 +72,9 @@ class LogDNAHandlerTest(unittest.TestCase):
         serverThread.join()
         logdnaThread.join()
 
-        self.assertTrue(len(expectedLines) == 1)
-        self.assertTrue(len(test.buf) == 0)
-        self.assertTrue(line in expectedLines)
+        self.assertEqual(len(expectedLines), 1)
+        self.assertEqual(len(test.buf), 0)
+        self.assertIn(line, expectedLines)
 
     def messages_preserved_if_excp(self):
         options = {
@@ -112,7 +112,7 @@ class LogDNAHandlerTest(unittest.TestCase):
           'url': 'http://localhost:1337',
           'ip': '10.0.1.1',
           'mac': 'C0:FF:EE:C0:FF:EE',
-          'buf_retention_limit': 200
+          'buf_retention_limit': 100
 
         }
         server_address = ('localhost', 1337)
@@ -139,6 +139,7 @@ class LogDNAHandlerTest(unittest.TestCase):
 
         serverThread.join()
         logdnaThread.join()
+
         self.assertEqual(len(failedCaseLogger.buf), 1)
         self.assertNotEqual(failedCaseLogger.buf[0]['line'], lineTwo)
 

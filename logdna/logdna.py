@@ -73,21 +73,18 @@ class LogDNAHandler(logging.Handler):
 
             self.lock.release()
 
-            if sys.getsizeof(self.buf) >= self.flush_limit and self.exception_flag == False:
+            if sys.getsizeof(self.buf) >= self.flush_limit and not self.exception_flag:
                 self.flush()
                 return
 
         if not self.flusher:
-            interval = self.retry_interval_secs if self.exception_flag == True else self.flush_interval
+            interval = self.retry_interval_secs if self.exception_flag else self.flush_interval
             self.flusher = threading.Timer(interval, self.flush)
             self.flusher.start()
 
     def flush(self):
-        if not self.buf or len(self.buf) < 0:
+        if not self.buf or len(self.buf) <= 0:
             return
-        self.buf = self.buf + self.secondary
-        self.secondary = []
-        data = {'e': 'ls', 'ls': self.buf}
         try:
             # Ensure we have the lock when flushing
             if not self.lock.acquire(blocking=False):
@@ -95,6 +92,10 @@ class LogDNAHandler(logging.Handler):
                     self.flusher = threading.Timer(1, self.flush)
                     self.flusher.start()
             else:
+                self.buf = self.buf + self.secondary
+                self.secondary = []
+                data = {'e': 'ls', 'ls': self.buf}
+
                 res = requests.post(
                     url=self.url,
                     json=data,
@@ -168,6 +169,6 @@ class LogDNAHandler(logging.Handler):
 
         Make sure that the log handler has attempted to flush the log buffer before closing.
         """
-        if self.exception_flag == False and len(self.buf) > 0:
+        if len(self.buf) > 0 and not self.exception_flag:
             self.flush()
         logging.Handler.close(self)
