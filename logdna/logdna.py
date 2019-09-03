@@ -28,7 +28,6 @@ class LogDNAHandler(logging.Handler):
         self.exception_flag = False
         self.flusher = None
         self.max_length = defaults['MAX_LINE_LENGTH']
-        self.retry_backoff_factor = 0.5
 
         self.hostname = options.get('hostname', socket.gethostname())
         self.ip = options.get('ip', get_ip())
@@ -46,6 +45,7 @@ class LogDNAHandler(logging.Handler):
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
         self.buf_retention_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_LIMIT'])
+        self.buf_size = 0
         self.exception_flag = False
 
         if isinstance(self.tags, str):
@@ -54,6 +54,12 @@ class LogDNAHandler(logging.Handler):
             self.tags = []
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
+
+    def get_message_size(self, message):
+        sum = 0
+        for key in message:
+            sum += sys.getsizeof(key) + sys.getsizeof(message[key])
+        return sum
 
     def buffer_log(self, message):
         if message and message['line']:
@@ -66,16 +72,17 @@ class LogDNAHandler(logging.Handler):
         if not self.lock.acquire(blocking=False):
             self.secondary.append(message)
         else:
-            if sys.getsizeof(self.buf) < self.buf_retention_limit:
+            messageSize = self.get_message_size(message)
+            if self.buf_size + messageSize < self.buf_retention_limit:
+                self.buf_size += messageSize
                 self.buf.append(message)
             else:
                 self.internalLogger.debug('The buffer size exceeded the limit: %s', self.buf_retention_limit)
 
             self.lock.release()
 
-            if sys.getsizeof(self.buf) >= self.flush_limit and not self.exception_flag:
+            if self.buf_size >= self.flush_limit and not self.exception_flag:
                 self.flush()
-                return
 
         if not self.flusher:
             interval = self.retry_interval_secs if self.exception_flag else self.flush_interval
@@ -83,8 +90,6 @@ class LogDNAHandler(logging.Handler):
             self.flusher.start()
 
     def flush(self):
-        if not self.buf or len(self.buf) <= 0:
-            return
         try:
             # Ensure we have the lock when flushing
             if not self.lock.acquire(blocking=False):
@@ -108,6 +113,7 @@ class LogDNAHandler(logging.Handler):
                     stream=True,
                     timeout=self.request_timeout)
                 res.raise_for_status()
+
                 # when no RequestException happened
                 self.buf = []
                 self.exception_flag = False
