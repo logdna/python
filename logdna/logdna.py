@@ -26,7 +26,6 @@ class LogDNAHandler(logging.Handler):
         self.buf = []
         self.secondary = []
         self.exception_flag = False
-        self.buf_byte_length = 0
         self.flusher = None
         self.max_length = defaults['MAX_LINE_LENGTH']
         self.retry_backoff_factor = 0.5
@@ -67,15 +66,14 @@ class LogDNAHandler(logging.Handler):
         if not self.lock.acquire(blocking=False):
             self.secondary.append(message)
         else:
-            if self.buf_byte_length < self.buf_retention_limit:
-                self.buf_byte_length += sys.getsizeof(message)
+            if sys.getsizeof(self.buf) < self.buf_retention_limit:
                 self.buf.append(message)
             else:
                 self.internalLogger.debug('The buffer size exceeded the limit: %s', self.buf_retention_limit)
 
             self.lock.release()
 
-            if self.buf_byte_length >= self.flush_limit and self.exception_flag == False:
+            if sys.getsizeof(self.buf) >= self.flush_limit and self.exception_flag == False:
                 self.flush()
                 return
 
@@ -88,6 +86,7 @@ class LogDNAHandler(logging.Handler):
         if not self.buf or len(self.buf) < 0:
             return
         self.buf = self.buf + self.secondary
+        self.secondary = []
         data = {'e': 'ls', 'ls': self.buf}
         try:
             # Ensure we have the lock when flushing
@@ -110,9 +109,7 @@ class LogDNAHandler(logging.Handler):
                 res.raise_for_status()
                 # when no RequestException happened
                 self.buf = []
-                self.secondary = []
                 self.exception_flag = False
-                self.buf_byte_length = 0
                 if self.flusher:
                     self.flusher.cancel()
                     self.flusher = None
