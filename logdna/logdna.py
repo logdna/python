@@ -5,6 +5,7 @@ import socket
 import sys
 import threading
 import time
+from functools import reduce
 
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
@@ -45,7 +46,6 @@ class LogDNAHandler(logging.Handler):
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
         self.buf_retention_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_LIMIT'])
-        self.buf_size = 0
         self.exception_flag = False
 
         if isinstance(self.tags, str):
@@ -54,12 +54,6 @@ class LogDNAHandler(logging.Handler):
             self.tags = []
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
-
-    def get_message_size(self, message):
-        sum = 0
-        for key in message:
-            sum += sys.getsizeof(key) + sys.getsizeof(message[key])
-        return sum
 
     def buffer_log(self, message):
         if message and message['line']:
@@ -72,16 +66,16 @@ class LogDNAHandler(logging.Handler):
         if not self.lock.acquire(blocking=False):
             self.secondary.append(message)
         else:
-            messageSize = self.get_message_size(message)
-            if self.buf_size + messageSize < self.buf_retention_limit:
-                self.buf_size += messageSize
+            lengthsOfMessages = list(map(lambda mes: len(mes['line']), self.buf))
+            bufSize = reduce((lambda a,b : a + b), lengthsOfMessages) if len(lengthsOfMessages) > 0 else 0
+
+            if bufSize + len(message['line']) < self.buf_retention_limit:
                 self.buf.append(message)
             else:
                 self.internalLogger.debug('The buffer size exceeded the limit: %s', self.buf_retention_limit)
-
             self.lock.release()
 
-            if self.buf_size >= self.flush_limit and not self.exception_flag:
+            if bufSize >= self.flush_limit and not self.exception_flag:
                 self.flush()
 
         if not self.flusher:
@@ -115,7 +109,7 @@ class LogDNAHandler(logging.Handler):
                 res.raise_for_status()
 
                 # when no RequestException happened
-                self.buf = []
+                del self.buf[:]
                 self.exception_flag = False
                 if self.flusher:
                     self.flusher.cancel()
@@ -127,7 +121,11 @@ class LogDNAHandler(logging.Handler):
             self.exception_flag = True
             if self.verbose in ['true', 'error', 'err', 'e']:
                 self.internalLogger.debug('Error sending logs %s', e)
-        self.lock.release()
+        try:
+            self.lock.release()
+        except threading.ThreadError as e:
+            self.internalLogger.debug("Could not unlock: %s", e)
+
 
     def emit(self, record):
         msg = self.format(record)
