@@ -91,8 +91,6 @@ class LogDNAHandler(logging.Handler):
             self.flusher = None
 
     def excpetion_actions(self, excpetion):
-       print("BBBBBAAAAD")
-       print(self.buf)
        if self.flusher:
            self.flusher.cancel()
            self.flusher = None
@@ -119,8 +117,6 @@ class LogDNAHandler(logging.Handler):
                timeout=self.request_timeout)
            res.raise_for_status()
            # when no RequestException happened
-           print("All good")
-           print(self.buf)
            self.cleaning_after_success()
        except requests.exceptions.RequestException as e:
            self.excpetion_actions(e)
