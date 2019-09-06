@@ -17,11 +17,11 @@ class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
         logging.Handler.__init__(self)
 
-        self.internalHandler = logging.StreamHandler(sys.stdout)
-        self.internalHandler.setLevel(logging.DEBUG)
+        self.internal_handler = logging.StreamHandler(sys.stdout)
+        self.internal_handler.setLevel(logging.DEBUG)
         self.internalLogger = logging.getLogger('internal')
         self.internalLogger.setLevel(logging.DEBUG)
-        self.internalLogger.addHandler(self.internalHandler)
+        self.internalLogger.addHandler(self.internal_handler)
 
         self.key = key
         self.buf = []
@@ -63,69 +63,77 @@ class LogDNAHandler(logging.Handler):
                     self.internalLogger.debug('Line was longer than %s chars and was truncated.', self.max_length)
 
         # Attempt to acquire lock to write to buf, otherwise write to secondary as flush occurs
-        if not self.lock.acquire(blocking=False):
-            self.secondary.append(message)
-        else:
-            lengthsOfMessages = list(map(lambda mes: len(mes['line']), self.buf))
-            bufSize = reduce((lambda a,b : a + b), lengthsOfMessages) if len(lengthsOfMessages) > 0 else 0
+        if self.lock.acquire(blocking=False):
+            lengths_of_messages = list(map(lambda mes: len(mes['line']), self.buf))
+            buf_size = reduce(lambda x, y: x + len(y['line']), self.buf, 0)
 
-            if bufSize + len(message['line']) < self.buf_retention_limit:
+            if buf_size + len(message['line']) < self.buf_retention_limit:
                 self.buf.append(message)
             else:
                 self.internalLogger.debug('The buffer size exceeded the limit: %s', self.buf_retention_limit)
             self.lock.release()
 
-            if bufSize >= self.flush_limit and not self.exception_flag:
+            if buf_size >= self.flush_limit and not self.exception_flag:
                 self.flush()
+        else:
+            self.secondary.append(message)
 
         if not self.flusher:
             interval = self.retry_interval_secs if self.exception_flag else self.flush_interval
             self.flusher = threading.Timer(interval, self.flush)
             self.flusher.start()
 
+    def cleaning_after_success(self):
+        del self.buf[:]
+        self.exception_flag = False
+        if self.flusher:
+            self.flusher.cancel()
+            self.flusher = None
+
+    def excpetion_actions(self, excpetion):
+       print("BBBBBAAAAD")
+       print(self.buf)
+       if self.flusher:
+           self.flusher.cancel()
+           self.flusher = None
+       self.exception_flag = True
+       if self.verbose in ['true', 'error', 'err', 'e']:
+           self.internalLogger.debug('Error sending logs %s', excpetion)
+
+    # do not call without aquiring the lock
+    def send_request(self):
+       self.buf = self.buf + self.secondary
+       self.secondary = []
+       data = {'e': 'ls', 'ls': self.buf}
+       try:
+           res = requests.post(
+               url=self.url,
+               json=data,
+               auth=('user', self.key),
+               params={
+                   'hostname': self.hostname,
+                   'ip': self.ip,
+                   'mac': self.mac if self.mac else None,
+                   'tags': self.tags if self.tags else None},
+               stream=True,
+               timeout=self.request_timeout)
+           res.raise_for_status()
+           # when no RequestException happened
+           print("All good")
+           print(self.buf)
+           self.cleaning_after_success()
+       except requests.exceptions.RequestException as e:
+           self.excpetion_actions(e)
+
     def flush(self):
-        try:
-            # Ensure we have the lock when flushing
-            if not self.lock.acquire(blocking=False):
-                if not self.flusher:
-                    self.flusher = threading.Timer(1, self.flush)
-                    self.flusher.start()
-            else:
-                self.buf = self.buf + self.secondary
-                self.secondary = []
-                data = {'e': 'ls', 'ls': self.buf}
-
-                res = requests.post(
-                    url=self.url,
-                    json=data,
-                    auth=('user', self.key),
-                    params={
-                        'hostname': self.hostname,
-                        'ip': self.ip,
-                        'mac': self.mac if self.mac else None,
-                        'tags': self.tags if self.tags else None},
-                    stream=True,
-                    timeout=self.request_timeout)
-                res.raise_for_status()
-
-                # when no RequestException happened
-                del self.buf[:]
-                self.exception_flag = False
-                if self.flusher:
-                    self.flusher.cancel()
-                    self.flusher = None
-        except requests.exceptions.RequestException as e:
-            if self.flusher:
-                self.flusher.cancel()
-                self.flusher = None
-            self.exception_flag = True
-            if self.verbose in ['true', 'error', 'err', 'e']:
-                self.internalLogger.debug('Error sending logs %s', e)
-        try:
+        if len(self.buf) == 0: return
+        if self.lock.acquire(blocking=False):
+            self.send_request()
             self.lock.release()
-        except threading.ThreadError as e:
-            self.internalLogger.debug("Could not unlock: %s", e)
-
+        else:
+            if not self.flusher:
+                self.flusher = threading.Timer(1, self.flush)
+                self.flusher.start()
 
     def emit(self, record):
         msg = self.format(record)
