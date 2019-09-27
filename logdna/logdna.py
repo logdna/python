@@ -46,7 +46,6 @@ class LogDNAHandler(logging.Handler):
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
         self.buf_retention_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_LIMIT'])
-        self.exception_flag = False
 
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
@@ -64,7 +63,6 @@ class LogDNAHandler(logging.Handler):
 
         # Attempt to acquire lock to write to buf, otherwise write to secondary as flush occurs
         if self.lock.acquire(blocking=False):
-            lengths_of_messages = list(map(lambda mes: len(mes['line']), self.buf))
             buf_size = reduce(lambda x, y: x + len(y['line']), self.buf, 0)
 
             if buf_size + len(message['line']) < self.buf_retention_limit:
@@ -83,24 +81,24 @@ class LogDNAHandler(logging.Handler):
             self.flusher = threading.Timer(interval, self.flush)
             self.flusher.start()
 
-    def cleaning_after_success(self):
+    def clean_after_success(self):
         del self.buf[:]
         self.exception_flag = False
         if self.flusher:
             self.flusher.cancel()
             self.flusher = None
 
-    def excpetion_actions(self, excpetion):
+    def handle_exception(self, exception):
        if self.flusher:
            self.flusher.cancel()
            self.flusher = None
        self.exception_flag = True
        if self.verbose in ['true', 'error', 'err', 'e']:
-           self.internalLogger.debug('Error sending logs %s', excpetion)
+           self.internalLogger.debug('Error sending logs %s', exception)
 
     # do not call without aquiring the lock
     def send_request(self):
-       self.buf = self.buf + self.secondary
+       self.buf.extend(self.secondary)
        self.secondary = []
        data = {'e': 'ls', 'ls': self.buf}
        try:
@@ -117,12 +115,13 @@ class LogDNAHandler(logging.Handler):
                timeout=self.request_timeout)
            res.raise_for_status()
            # when no RequestException happened
-           self.cleaning_after_success()
+           self.clean_after_success()
        except requests.exceptions.RequestException as e:
-           self.excpetion_actions(e)
+           self.handle_exception(e)
 
     def flush(self):
-        if len(self.buf) == 0: return
+        if len(self.buf) == 0:
+            return
         if self.lock.acquire(blocking=False):
             self.send_request()
             self.lock.release()
