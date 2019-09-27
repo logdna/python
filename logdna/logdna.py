@@ -176,6 +176,6 @@ class LogDNAHandler(logging.Handler):
 
         Make sure that the log handler has attempted to flush the log buffer before closing.
         """
-        if len(self.buf) > 0 and not self.exception_flag:
+        if len(self.buf) > 0:
             self.flush()
         logging.Handler.close(self)
