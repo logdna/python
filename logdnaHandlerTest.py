@@ -16,15 +16,15 @@ log = logging.getLogger('logdna')
 log.setLevel(logging.INFO)
 
 options = {
-  'hostname': 'localhost',
-  'url': 'http://localhost:8081',
-  'ip': '10.0.1.1',
-  'mac': 'C0:FF:EE:C0:FF:EE'
+    'hostname': 'localhost',
+    'url': 'http://localhost:8081',
+    'ip': '10.0.1.1',
+    'mac': 'C0:FF:EE:C0:FF:EE'
 }
 
 expectedLines = []
 class successful_RequestHandler(BaseHTTPRequestHandler):
-  def do_POST(self):
+    def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         self.send_response(200)
@@ -35,7 +35,7 @@ class successful_RequestHandler(BaseHTTPRequestHandler):
             expectedLines.append(keys['line'])
 
 class failed_RequestHandler(BaseHTTPRequestHandler):
-  def do_POST(self):
+    def do_POST(self):
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         self.send_response(400)
@@ -44,10 +44,10 @@ class failed_RequestHandler(BaseHTTPRequestHandler):
 class LogDNAHandlerTest(unittest.TestCase):
     def server_recieves_messages(self):
         options = {
-          'hostname': 'localhost',
-          'url': 'http://localhost:8081',
-          'ip': '10.0.1.1',
-          'mac': 'C0:FF:EE:C0:FF:EE'
+            'hostname': 'localhost',
+            'url': 'http://localhost:8081',
+            'ip': '10.0.1.1',
+            'mac': 'C0:FF:EE:C0:FF:EE'
         }
 
         server_address = ('localhost', 8081)
@@ -76,10 +76,10 @@ class LogDNAHandlerTest(unittest.TestCase):
 
     def messages_preserved_if_excp(self):
         options = {
-          'hostname': 'localhost',
-          'url': 'http://localhost:8080',
-          'ip': '10.0.1.1',
-          'mac': 'C0:FF:EE:C0:FF:EE'
+            'hostname': 'localhost',
+            'url': 'http://localhost:8080',
+            'ip': '10.0.1.1',
+            'mac': 'C0:FF:EE:C0:FF:EE'
         }
         server_address = ('localhost', 8080)
         httpd = HTTPServer(server_address, failed_RequestHandler)
@@ -106,15 +106,14 @@ class LogDNAHandlerTest(unittest.TestCase):
 
     def stops_retention_when_buf_is_full(self):
         options = {
-          'hostname': 'localhost',
-          'url': 'http://localhost:1337',
-          'ip': '10.0.1.1',
-          'mac': 'C0:FF:EE:C0:FF:EE',
-          'buf_retention_limit': 50,
-          'equest_timeout': 10,
-          'flush_interval': 1,
-          'retry_interval_secs': 1
-
+            'hostname': 'localhost',
+            'url': 'http://localhost:1337',
+            'ip': '10.0.1.1',
+            'mac': 'C0:FF:EE:C0:FF:EE',
+            'buf_retention_limit': 50,
+            'equest_timeout': 10,
+            'flush_interval': 1,
+            'retry_interval_secs': 1
         }
         server_address = ('localhost', 1337)
 
