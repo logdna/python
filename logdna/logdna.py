@@ -44,7 +44,7 @@ class LogDNAHandler(logging.Handler):
         self.flush_interval = options.get('flush_interval', defaults['FLUSH_INTERVAL'])
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
-        self.buf_retention_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_LIMIT'])
+        self.buf_retention_byte_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_BYTE_LIMIT'])
 
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
@@ -64,10 +64,10 @@ class LogDNAHandler(logging.Handler):
         if self.lock.acquire(blocking=False):
             buf_size = reduce(lambda x, y: x + len(y['line']), self.buf, 0)
 
-            if buf_size + len(message['line']) < self.buf_retention_limit:
+            if buf_size + len(message['line']) < self.buf_retention_byte_limit:
                 self.buf.append(message)
             else:
-                self.internalLogger.debug('The buffer size exceeded the limit: %s', self.buf_retention_limit)
+                self.internalLogger.debug('The buffer size exceeded the limit: %s', self.buf_retention_byte_limit)
             self.lock.release()
 
             if buf_size >= self.flush_limit and not self.exception_flag:
