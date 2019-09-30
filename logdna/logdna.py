@@ -41,7 +41,7 @@ class LogDNAHandler(logging.Handler):
         self.include_standard_meta = options.get('include_standard_meta', False)
         self.index_meta = options.get('index_meta', False)
         self.flush_limit = options.get('flush_limit', defaults['FLUSH_BYTE_LIMIT'])
-        self.flush_interval = options.get('flush_interval', defaults['FLUSH_INTERVAL'])
+        self.flush_interval_secs = options.get('flush_interval', defaults['FLUSH_INTERVAL_SECS'])
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
         self.buf_retention_byte_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_BYTE_LIMIT'])
@@ -76,7 +76,7 @@ class LogDNAHandler(logging.Handler):
             self.secondary.append(message)
 
         if not self.flusher:
-            interval = self.retry_interval_secs if self.exception_flag else self.flush_interval
+            interval = self.retry_interval_secs if self.exception_flag else self.flush_interval_secs
             self.flusher = threading.Timer(interval, self.flush)
             self.flusher.start()
 
