@@ -16,7 +16,6 @@ from .utils import sanitize_meta, get_ip
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
         logging.Handler.__init__(self)
-
         self.internal_handler = logging.StreamHandler(sys.stdout)
         self.internal_handler.setLevel(logging.DEBUG)
         self.internalLogger = logging.getLogger('internal')
@@ -89,20 +88,20 @@ class LogDNAHandler(logging.Handler):
             self.flusher = None
 
     def handle_exception(self, exception):
-       if self.flusher:
-           self.flusher.cancel()
-           self.flusher = None
-       self.exception_flag = True
-       if self.verbose in ['true', 'error', 'err', 'e']:
-           self.internalLogger.debug('Error sending logs %s', exception)
+        if self.flusher:
+            self.flusher.cancel()
+            self.flusher = None
+        self.exception_flag = True
+        if self.verbose in ['true', 'error', 'err', 'e']:
+            self.internalLogger.debug('Error sending logs %s', exception)
 
-    # do not call without aquiring the lock
+    # do not call without acquiring the lock
     def send_request(self):
-       self.buf.extend(self.secondary)
-       self.secondary = []
-       data = {'e': 'ls', 'ls': self.buf}
-       try:
-           res = requests.post(
+        self.buf.extend(self.secondary)
+        self.secondary = []
+        data = {'e': 'ls', 'ls': self.buf}
+        try:
+            res = requests.post(
                url=self.url,
                json=data,
                auth=('user', self.key),
