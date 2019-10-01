@@ -112,11 +112,11 @@ class LogDNAHandler(logging.Handler):
                    'tags': self.tags if self.tags else None},
                stream=True,
                timeout=self.request_timeout)
-           res.raise_for_status()
+            res.raise_for_status()
            # when no RequestException happened
-           self.clean_after_success()
-       except requests.exceptions.RequestException as e:
-           self.handle_exception(e)
+            self.clean_after_success()
+        except requests.exceptions.RequestException as e:
+            self.handle_exception(e)
 
     def flush(self):
         if len(self.buf) == 0:
