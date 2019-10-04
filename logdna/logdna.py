@@ -1,5 +1,6 @@
 import json
 import logging
+import platform
 import requests
 import socket
 import sys
@@ -12,6 +13,7 @@ from urllib3.util import Retry
 
 from .configs import defaults
 from .utils import sanitize_meta, get_ip
+
 
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
@@ -100,6 +102,10 @@ class LogDNAHandler(logging.Handler):
         self.buf.extend(self.secondary)
         self.secondary = []
         data = {'e': 'ls', 'ls': self.buf}
+        with open('VERSION.txt') as version_file:
+            pkg_version = version_file.read().strip()
+        headers = {
+            'User-Agent':'python/%s (%s %s)' % (pkg_version, platform.system(), platform.release())}
         try:
             res = requests.post(
                url=self.url,
@@ -111,7 +117,9 @@ class LogDNAHandler(logging.Handler):
                    'mac': self.mac if self.mac else None,
                    'tags': self.tags if self.tags else None},
                stream=True,
-               timeout=self.request_timeout)
+               timeout=self.request_timeout,
+               headers=headers
+               )
             res.raise_for_status()
            # when no RequestException happened
             self.clean_after_success()
