@@ -14,7 +14,6 @@ from urllib3.util import Retry
 from .configs import defaults
 from .utils import sanitize_meta, get_ip
 
-
 class LogDNAHandler(logging.Handler):
     def __init__(self, key, options={}):
         logging.Handler.__init__(self)
