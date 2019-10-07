@@ -1,5 +1,4 @@
-with open('VERSION.txt') as version_file:
-    pkg_version = version_file.read().strip()
+from _version import __version__
 
 defaults = {
     'DEFAULT_REQUEST_TIMEOUT': 30,
@@ -9,5 +8,5 @@ defaults = {
     'LOGDNA_URL': 'https://logs.logdna.com/logs/ingest',
     'BUF_RETENTION_BYTE_LIMIT': 4 * 1024 * 1024,
     'RETRY_INTERVAL_SECS': 8,
-    'LOGDNA_PKG_V': pkg_version
+    'LOGDNA_PKG_V': __version__
 }

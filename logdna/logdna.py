@@ -1,6 +1,5 @@
 import json
 import logging
-import platform
 import requests
 import socket
 import sys
@@ -46,6 +45,7 @@ class LogDNAHandler(logging.Handler):
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
         self.buf_retention_byte_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_BYTE_LIMIT'])
+        self.user_agent = 'python/%s' % (options.get('logdna_pkg_v', defaults['LOGDNA_PKG_V']))
 
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
@@ -101,10 +101,6 @@ class LogDNAHandler(logging.Handler):
         self.buf.extend(self.secondary)
         self.secondary = []
         data = {'e': 'ls', 'ls': self.buf}
-        with open('VERSION.txt') as version_file:
-            pkg_version = version_file.read().strip()
-        headers = {
-            'User-Agent':'python/%s' % (options.get('logdna_pkg_v', defaults['LOGDNA_PKG_V']))}
         try:
             res = requests.post(
                url=self.url,
@@ -117,7 +113,7 @@ class LogDNAHandler(logging.Handler):
                    'tags': self.tags if self.tags else None},
                stream=True,
                timeout=self.request_timeout,
-               headers=headers
+               headers={'User-Agent': self.user_agent}
                )
             res.raise_for_status()
            # when no RequestException happened
