@@ -46,7 +46,7 @@ class LogDNAHandler(logging.Handler):
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
         self.buf_retention_byte_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_BYTE_LIMIT'])
-
+        
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
         elif not isinstance(self.tags, list):
@@ -104,7 +104,7 @@ class LogDNAHandler(logging.Handler):
         with open('VERSION.txt') as version_file:
             pkg_version = version_file.read().strip()
         headers = {
-            'User-Agent':'python/%s (%s %s)' % (pkg_version, platform.system(), platform.release())}
+            'User-Agent':'python/%s' % (options.get('logdna_pkg_v', defaults['LOGDNA_PKG_V']))}
         try:
             res = requests.post(
                url=self.url,
