@@ -46,7 +46,7 @@ class LogDNAHandler(logging.Handler):
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
         self.buf_retention_byte_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_BYTE_LIMIT'])
-        
+
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
         elif not isinstance(self.tags, list):
