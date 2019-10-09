@@ -8,5 +8,5 @@ defaults = {
     'LOGDNA_URL': 'https://logs.logdna.com/logs/ingest',
     'BUF_RETENTION_BYTE_LIMIT': 4 * 1024 * 1024,
     'RETRY_INTERVAL_SECS': 8,
-    'LOGDNA_PKG_V': __version__
+    'USER_AGENT': __version__
 }
