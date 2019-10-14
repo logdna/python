@@ -1,5 +1,6 @@
 from setuptools import setup
 from os import path
+from _version import __version__
 
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
@@ -9,7 +10,7 @@ with open(path.join(this_directory, 'README.md'), 'rb') as f:
 setup(
   name = 'logdna',
   packages = ['logdna'],
-  version = '1.4.2',
+  version = __version__,
   description = 'A Python Package for Sending Logs to LogDNA',
   author = 'LogDNA Inc.',
   author_email = 'help@logdna.com',

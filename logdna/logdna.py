@@ -45,6 +45,7 @@ class LogDNAHandler(logging.Handler):
         self.retry_interval_secs = options.get('retry_interval_secs', defaults['RETRY_INTERVAL_SECS'])
         self.tags = options.get('tags', [])
         self.buf_retention_byte_limit = options.get('buf_retention_limit', defaults['BUF_RETENTION_BYTE_LIMIT'])
+        self.user_agent = options.get('user_agent', defaults['USER_AGENT'])
 
         if isinstance(self.tags, str):
             self.tags = [tag.strip() for tag in self.tags.split(',')]
@@ -111,7 +112,9 @@ class LogDNAHandler(logging.Handler):
                    'mac': self.mac if self.mac else None,
                    'tags': self.tags if self.tags else None},
                stream=True,
-               timeout=self.request_timeout)
+               timeout=self.request_timeout,
+               headers={'user-agent': self.user_agent}
+               )
             res.raise_for_status()
            # when no RequestException happened
             self.clean_after_success()
