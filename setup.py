@@ -16,7 +16,7 @@ setup(
   author_email = 'help@logdna.com',
   license = 'MIT',
   url = 'https://github.com/logdna/python',
-  download_url = 'https://github.com/logdna/python/tarball/1.4.2',
+  download_url = ('https://github.com/logdna/python/tarball/%s' %(__version__)),
   keywords = ['logdna', 'logging', 'logs', 'python', 'logdna.com', 'logger'],
   install_requires=[
     'requests',
