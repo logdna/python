@@ -1,4 +1,7 @@
-from _version import __version__
+import os.path
+import sys
+import inspect
+import _version
 
 defaults = {
     'DEFAULT_REQUEST_TIMEOUT': 30,
@@ -8,5 +11,5 @@ defaults = {
     'LOGDNA_URL': 'https://logs.logdna.com/logs/ingest',
     'BUF_RETENTION_BYTE_LIMIT': 4 * 1024 * 1024,
     'RETRY_INTERVAL_SECS': 8,
-    'USER_AGENT': 'python/%s' % __version__
+    'USER_AGENT': 'python/%s' % _version.__version__
 }
