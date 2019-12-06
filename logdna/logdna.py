@@ -9,7 +9,6 @@ from functools import reduce
 
 from requests.adapters import HTTPAdapter
 from urllib3.util import Retry
-
 from .configs import defaults
 from .utils import sanitize_meta, get_ip
 
