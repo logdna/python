@@ -1,4 +1,4 @@
-import _version
+from . import _version
 
 defaults = {
     'DEFAULT_REQUEST_TIMEOUT': 30,
