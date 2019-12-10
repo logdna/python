@@ -1,13 +1,15 @@
 
 [tool.poetry]
-name = 'logdna'
-version = '1.5.2'
+name = 'Vilya'
+version = '1.5.3'
 description = 'A Python Package for Sending Logs to LogDNA'
 authors = ['LogDNA Inc.']
 license = 'MIT'
+repository='https://github.com/logdna/python'
+#keywords=['logdna', 'logging', 'logs', 'python', 'logdna.com', 'logger']
 
 [tool.poetry.dependencies]
-requests = "^2.7.0"
+requests = "^2.22.0"
 
 [tool.poetry.dev-dependencies]
 

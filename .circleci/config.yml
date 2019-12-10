@@ -10,19 +10,20 @@ jobs:
           command: |
             TAG_VERSION=$(git tag -l --sort=-v:refname | head -n 1 | cut -d'-' -f2)
             PKG_VERSION=$(cat logdna/_version.py | grep "__version__ = " | cut -d'=' -f2 | cut -d"'" -f2)
-            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" ]]; then
+            PKG_VERSION_TOML=$(cat pyproject.toml | grep "version = " | cut -d'=' -f2 | cut -d"'" -f2)
+
+            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" ] -a ["${TAG_VERSION}" != "${PKG_VERSION_TOML}"]]; then
               echo "There is mismatch:"
               echo "  TAG_VERSION: ${TAG_VERSION}"
               echo "  PKG_VERSION: ${PKG_VERSION}"
+              echo "  PKG_VERSION_TOML: ${PKG_VERSION_TOML}"
               exit 1
             fi
       - run:
           name: Publish
           command: |
-            sudo pip install twine
-            sudo pip3 install twine
-            python setup.py sdist
-            twine upload dist/*.tar.gz
+            curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+            poetry publish --build
 workflows:
   version: 2
   update_package:
