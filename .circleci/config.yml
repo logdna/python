@@ -20,6 +20,7 @@ jobs:
           name: Publish
           command: |
             sudo pip install twine
+            sudo pip install requests
             python setup.py sdist
             twine upload dist/*.tar.gz
 workflows:
