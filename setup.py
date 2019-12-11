@@ -4,9 +4,6 @@ from os import path
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
 
-version_path = "%s/logdna/_version" % this_directory
-
-
 with open(path.join(this_directory, 'README.md'), 'rb') as f:
     long_description = f.read().decode('utf-8')
 
