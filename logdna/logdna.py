@@ -5,7 +5,6 @@ import socket
 import sys
 import threading
 import time
-import toml
 from functools import reduce
 
 from requests.adapters import HTTPAdapter
