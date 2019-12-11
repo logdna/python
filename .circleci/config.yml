@@ -23,7 +23,8 @@ jobs:
           name: Publish
           command: |
             curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
-            poetry publish --build
+            poetry build
+            twine upload dist/*.tar.gz
 workflows:
   version: 2
   update_package:
