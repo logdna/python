@@ -12,7 +12,7 @@ jobs:
             PKG_VERSION=$(cat logdna/_version.py | grep "__version__ = " | cut -d'=' -f2 | cut -d"'" -f2)
             PKG_VERSION_TOML=$(cat pyproject.toml | grep "version = " | cut -d'=' -f2 | cut -d"'" -f2)
 
-            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" ] -a ["${TAG_VERSION}" != "${PKG_VERSION_TOML}"]]; then
+            if [[ "${TAG_VERSION}" != "${PKG_VERSION}" ] -o ["${TAG_VERSION}" != "${PKG_VERSION_TOML}"]]; then
               echo "There is mismatch:"
               echo "  TAG_VERSION: ${TAG_VERSION}"
               echo "  PKG_VERSION: ${PKG_VERSION}"
