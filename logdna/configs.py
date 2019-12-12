@@ -1,4 +1,7 @@
-from . import _version
+from os import path
+
+with open("%s/VERSION" % path.abspath(path.dirname(__file__))) as f:
+     version = f.read().split("'")[1]
 
 defaults = {
     'DEFAULT_REQUEST_TIMEOUT': 30,
@@ -8,5 +11,5 @@ defaults = {
     'LOGDNA_URL': 'https://logs.logdna.com/logs/ingest',
     'BUF_RETENTION_BYTE_LIMIT': 4 * 1024 * 1024,
     'RETRY_INTERVAL_SECS': 8,
-    'USER_AGENT': 'python/%s' % _version.__version__
+    'USER_AGENT': 'python/%s' % version
 }
