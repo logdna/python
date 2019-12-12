@@ -9,7 +9,7 @@ jobs:
           name: Check Tagged Push
           command: |
             TAG_VERSION=$(git tag -l --sort=-v:refname | head -n 1 | cut -d'-' -f2)
-            PKG_VERSION=$(cat logdna/VERSION | grep "__version__ = " | cut -d'=' -f2 | cut -d"'" -f2)
+            PKG_VERSION=$(cat logdna/VERSION)
             if [[ "${TAG_VERSION}" != "${PKG_VERSION}" ]]; then
               echo "There is mismatch:"
               echo "  TAG_VERSION: ${TAG_VERSION}"
