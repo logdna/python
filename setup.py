@@ -3,21 +3,23 @@ from os import path
 
 # read the contents of your README file
 this_directory = path.abspath(path.dirname(__file__))
-import logdna._version as _version
 
 with open(path.join(this_directory, 'README.md'), 'rb') as f:
     long_description = f.read().decode('utf-8')
 
+with open("%s/logdna/VERSION" % this_directory) as f:
+     version = f.read()
+
 setup(
   name = 'logdna',
   packages = ['logdna'],
-  version = _version.__version__,
+  version = version,
   description = 'A Python Package for Sending Logs to LogDNA',
   author = 'LogDNA Inc.',
   author_email = 'help@logdna.com',
   license = 'MIT',
   url = 'https://github.com/logdna/python',
-  download_url = ('https://github.com/logdna/python/tarball/%s' %(_version.__version__)),
+  download_url = ('https://github.com/logdna/python/tarball/%s' %(version)),
   keywords = ['logdna', 'logging', 'logs', 'python', 'logdna.com', 'logger'],
   install_requires=[
     'requests',
