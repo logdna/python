@@ -1,8 +1,9 @@
 from os import path
 
 with open("%s/VERSION" % path.abspath(path.dirname(__file__))) as f:
-     version = f.read()
+     version = f.read().strip('\n')
 
+print(version)
 defaults = {
     'DEFAULT_REQUEST_TIMEOUT': 30,
     'MAX_LINE_LENGTH': 32000,

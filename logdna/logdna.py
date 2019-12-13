@@ -100,6 +100,7 @@ class LogDNAHandler(logging.Handler):
         self.buf.extend(self.secondary)
         self.secondary = []
         data = {'e': 'ls', 'ls': self.buf}
+        
         try:
             res = requests.post(
                url=self.url,
@@ -112,7 +113,7 @@ class LogDNAHandler(logging.Handler):
                    'tags': self.tags if self.tags else None},
                stream=True,
                timeout=self.request_timeout,
-               headers={'user-agent': self.user_agent}
+               headers= {'user-agent': self.user_agent}
                )
             res.raise_for_status()
            # when no RequestException happened
