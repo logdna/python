@@ -79,6 +79,8 @@ workflows:
       - test:
           filters: *tagged_build_filters
       - build:
+          requires:
+            - test
           filters: *tagged_build_filters
       - release:
           requires:
