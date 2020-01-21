@@ -4,7 +4,18 @@ tagged_build_filters: &tagged_build_filters
     ignore: /.*/
   tags:
     only: /v[0-9]+\.[0-9]+\.[0-9]+/
+test_build_filters: &test_build_filters
+  branches:
+    only: /.*/
+  tags:
+    ignore: /v[0-9]+\.[0-9]+\.[0-9]+/
 jobs:
+  test:
+    docker:
+      - image: circleci/python:3
+    steps:
+      - checkout
+      - run: python logdnaHandlerTest.py
   build:
     docker:
       - image: circleci/python:3
@@ -65,7 +76,11 @@ jobs:
 workflows:
   update:
     jobs:
+      - test:
+          filters: *tagged_build_filters
       - build:
+          requires:
+            - test
           filters: *tagged_build_filters
       - release:
           requires:
@@ -80,3 +95,7 @@ workflows:
           requires:
             - approve
           filters: *tagged_build_filters
+test:
+    jobs:
+      - test:
+          filters: *test_build_filters
