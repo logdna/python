@@ -71,7 +71,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         server_thread.join()
         logdna_thread.join()
 
-        self.assertEqual(len(expectedLines), 2)
+        self.assertEqual(len(expectedLines), 1)
         self.assertIn(line, expectedLines)
 
     def messages_preserved_if_excp(self):
