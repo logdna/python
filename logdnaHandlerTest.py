@@ -25,7 +25,7 @@ options = {
 expectedLines = []
 class successful_RequestHandler(BaseHTTPRequestHandler):
     def do_POST(self):
-        
+
         content_length = int(self.headers['Content-Length'])
         body = self.rfile.read(content_length)
         self.send_response(200)
@@ -72,7 +72,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         server_thread.join()
         logdna_thread.join()
 
-        self.assertEqual(len(expectedLines), 1)
+        self.assertEqual(len(expectedLines), 2)
         self.assertIn(line, expectedLines)
 
     def messages_preserved_if_excp(self):
