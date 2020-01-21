@@ -77,7 +77,7 @@ workflows:
   update:
     jobs:
       - test:
-          filters: *tagged_build_filters
+          filters: *test_build_filters
       - build:
           requires:
             - test
