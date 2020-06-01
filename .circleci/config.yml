@@ -3,12 +3,12 @@ tagged_build_filters: &tagged_build_filters
   branches:
     ignore: /.*/
   tags:
-    only: /v[0-9]+\.[0-9]+\.[0-9]+/
+    only: /[0-9]+\.[0-9]+\.[0-9]+/
 test_build_filters: &test_build_filters
   branches:
     only: /.*/
   tags:
-    ignore: /v[0-9]+\.[0-9]+\.[0-9]+/
+    ignore: /[0-9]+\.[0-9]+\.[0-9]+/
 jobs:
   test:
     docker:
@@ -25,10 +25,10 @@ jobs:
           name: Check Tagged Push
           command: |
             PKG_VERSION=$(cat logdna/VERSION)
-            if [[ "${CIRCLE_TAG}" != "v${PKG_VERSION}" ]]; then
+            if [[ "${CIRCLE_TAG}" != "${PKG_VERSION}" ]]; then
               echo "There is mismatch:"
               echo "  TAG_VERSION: ${CIRCLE_TAG}"
-              echo "  PKG_VERSION: v${PKG_VERSION}"
+              echo "  PKG_VERSION: ${PKG_VERSION}"
               exit 1
             fi
       - run: python setup.py sdist
@@ -47,7 +47,7 @@ jobs:
           name: Create a Release
           command: |
             ghr \
-              -n "LogDNA Python Logger ${CIRCLE_TAG}" \
+              -n "LogDNA Python Logger v${CIRCLE_TAG}" \
               -t ${GITHUB_TOKEN} \
               -u ${CIRCLE_PROJECT_USERNAME} \
               -r ${CIRCLE_PROJECT_REPONAME} \
