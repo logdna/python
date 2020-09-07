@@ -32,8 +32,12 @@ $ pip install logdna
 ```python
 import logging
 from logdna import LogDNAHandler
+import os
 
-key = 'YOUR INGESTION KEY HERE'
+# Set your key as an env variable
+# then import here, its best not to
+# hard code your key!
+key=os.environ['INGESTION_KEY']
 
 log = logging.getLogger('logdna')
 log.setLevel(logging.INFO)
