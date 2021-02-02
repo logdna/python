@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "logdna"
+version = "1.5.4"
+description = "A python package for sending logs"
+authors = ["logdna <help@logdna.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+requests = "^2.25.1"
+
+[tool.poetry.dev-dependencies]
+coverage = "^5.4"
+"tap.py" = "^3.0"
+ipdb = "^0.13.4"
+flake8 = "^3.8.4"
+yapf = "^0.30.0"
+pytest = "^6.2.2"
+pytest-cov = "^2.11.1"
+
+[tool.poetry.scripts]
+test = "scripts.test:run"
+lint = "scripts.lint:run"
+"lint:fix" =  "scripts.lint:fix"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

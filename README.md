@@ -7,12 +7,20 @@
 
 ---
 
-* **[Installation](#installation)**
-* **[Setup](#setup)**
-* **[Usage](#usage)**
-* **[API](#api)**
-* **[License](#license)**
-
+* [Installation](#installation)
+* [Setup](#setup)
+* [Usage](#usage)
+  * [Usage with File Config](#usage-with-file-config)
+* [API](#api)
+  * [LogDNAHandler(key: string, [options: dict])](#logdnahandlerkey-string-options-dict)
+    * [key](#key)
+    * [options](#options)
+  * [log(line, [options])](#logline-options)
+    * [line](#line)
+    * [options](#options-1)
+* [Development](#development)
+  * [Scripts](#scripts)
+* [License](#license)
 
 ## Installation
 
@@ -51,11 +59,11 @@ _**Required**_
 * [LogDNA Ingestion Key](https://app.logdna.com/manage/profile)
 
 _**Optional**_
-* Hostname - *(String)* - max length 32 chars
-* MAC Address - *(String)*
-* IP Address - *(String)*
-* Max Length - *(Boolean)* - formatted as options['max_length']
-* Index Meta - *(Boolean)* - formatted as options['index_meta']
+* Hostname - ([string][]) - max length 32 chars
+* MAC Address - ([string][])
+* IP Address - ([string][])
+* Max Length - ([bool][]) - formatted as options['max_length']
+* Index Meta - ([bool][]) - formatted as options['index_meta']
 
 ## Usage
 
@@ -88,7 +96,7 @@ log.info('My Sample Log Line', opts)
 
 ### Usage with File Config
 
-To use `LogDNAHandler` with [`fileConfig`](https://docs.python.org/2/library/logging.config.html#logging.config.fileConfig) (e.g., in a Django `settings.py` file):
+To use [LogDNAHandler](#logdnahandlerkey-string-options-dict) with [fileConfig][] (e.g., in a Django `settings.py` file):
 
 ```python
 import os
@@ -122,12 +130,12 @@ LOGGING = {
 
 ## API
 
-### LogDNAHandler(key, [options])
----
+### LogDNAHandler(key: [string][], [options: [dict][]])
+
 #### key
 
 * _**Required**_
-* Type: `String`
+* Type: [string][]
 * Values: `YourAPIKey`
 
 The [LogDNA API Key](https://app.logdna.com/manage/profile) associated with your account.
@@ -137,7 +145,7 @@ The [LogDNA API Key](https://app.logdna.com/manage/profile) associated with your
 ##### app
 
 * _Optional_
-* Type: `String`
+* Type: [string][]
 * Default: `''`
 * Values: `YourCustomApp`
 * Max Length: `32`
@@ -147,7 +155,7 @@ The default app passed along with every log sent through this instance.
 ##### env
 
 * _Optional_
-* Type: `String`
+* Type: [string][]
 * Default: `''`
 * Values: `YourCustomEnv`
 * Max Length: `32`
@@ -157,7 +165,7 @@ The default env passed along with every log sent through this instance.
 ##### hostname
 
 * _Optional_
-* Type: `String`
+* Type: [string][]
 * Default: `''`
 * Values: `YourCustomHostname`
 * Max Length: `32`
@@ -167,16 +175,18 @@ The default hostname passed along with every log sent through this instance.
 ##### include_standard_meta
 
 * _Optional_
-* Type: `Boolean`
+* Type: [bool][]
 * Default: `False`
 
-Python [`LogRecord` objects](https://docs.python.org/2/library/logging.html#logrecord-objects) includes language-specific information that may be useful metadata in logs.  Setting `include_standard_meta` to `True` automatically populates meta objects with `name`, `pathname`, and `lineno` from the `LogRecord`.  See [`LogRecord` docs](https://docs.python.org/2/library/logging.html#logrecord-objects) for more details about these values.
+Python [LogRecord][] objects includes language-specific information that may be useful metadata in logs.
+Setting `include_standard_meta` to `True` automatically populates meta objects with `name`, `pathname`, and `lineno`
+from the [LogRecord][].
 
 
 ##### index_meta
 
 * _Optional_
-* Type: `Boolean`
+* Type: [bool][]
 * Default: `False`
 
 We allow meta objects to be passed with each line. By default these meta objects are stringified and not searchable, and are only displayed for informational purposes.
@@ -189,7 +199,7 @@ If this option is set to True then meta objects are parsed and searchable up to 
 ##### level
 
 * _Optional_
-* Type: `String`
+* Type: [string][]
 * Default: `Info`
 * Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
 * Max Length: `32`
@@ -199,16 +209,16 @@ The default level passed along with every log sent through this instance.
 ##### verbose
 
 * _Optional_
-* Type: `String` or `Boolean`
+* Type: [string][] or [bool][]
 * Default: `True`
-* Values: False or any level
+* Values: `False` or any level
 
 Sets the verbosity of log statements for failures.
 
 ##### request_timeout
 
 * _Optional_
-* Type: `int`
+* Type: [int][]
 * Default: `30000`
 
 The amount of time (in ms) the request should wait for LogDNA to respond before timing out.
@@ -216,7 +226,7 @@ The amount of time (in ms) the request should wait for LogDNA to respond before 
 ##### tags
 
 * _Optional_
-* Type: `String[]`
+* Type: [list][]&lt;[string][]&gt;
 * Default: `[]`
 
 List of tags used to dynamically group hosts.  More information on tags is available at [How Do I Use Host Tags?](https://docs.logdna.com/docs/logdna-agent#section-how-do-i-use-host-tags-)
@@ -224,17 +234,17 @@ List of tags used to dynamically group hosts.  More information on tags is avail
 ##### url
 
 * _Optional_
-* Type: `String`
+* Type: [string][]
 * Default: `'https://logs.logdna.com/logs/ingest'`
 
 A custom ingestion endpoint to stream log lines into.
 
 ### log(line, [options])
----
+
 #### line
 
 * _Required_
-* Type: `String`
+* Type: [string][]
 * Default: `''`
 * Max Length: `32000`
 
@@ -245,7 +255,7 @@ The log line to be sent to LogDNA.
 ##### level
 
 * _Optional_
-* Type: `String`
+* Type: [string][]
 * Default: `Info`
 * Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
 * Max Length: `32`
@@ -255,7 +265,7 @@ The level passed along with this log line.
 ##### app
 
 * _Optional_
-* Type: `String`
+* Type: [string][]
 * Default: `''`
 * Values: `YourCustomApp`
 * Max Length: `32`
@@ -265,7 +275,7 @@ The app passed along with this log line.
 ##### env
 
 * _Optional_
-* Type: `String`
+* Type: [string][]
 * Default: `''`
 * Values: `YourCustomEnv`
 * Max Length: `32`
@@ -275,16 +285,17 @@ The environment passed with this log line.
 ##### meta
 
 * _Optional_
-* Type: `JSON`
+* Type: [dict][]
 * Default: `None`
 
-A meta object for additional metadata about the log line that is passed. Please ensure values are JSON serializable,
-values that are not JSON serializable will be removed and the respective keys will be added to the `__errors` string.
+A standard dictonary containing additional metadata about the log line that is passed. Please ensure values are JSON serializable.
+
+**NOTE**: Values that are not JSON serializable will be removed and the respective keys will be added to the `__errors` string.
 
 ##### index_meta
 
 * _Optional_
-* Type: `Boolean`
+* Type: [bool][]
 * Default: `False`
 
 We allow meta objects to be passed with each line. By default these meta objects will be stringified and will not be
@@ -297,13 +308,58 @@ If this option is turned to true then meta objects will be parsed and will be se
 ##### timestamp
 
 * _Optional_
-* Default: `time.time()`
+* Type: [float][]
+* Default: [time.time()][]
 
 The time in seconds since the epoch to use for the log timestamp. It must be within one day or current time - if it is not, it is ignored and time.time() is used in its place.
 
 
+## Development
+
+This project makes use of the [poetry][] package manager for local development.
+
+### Scripts
+
+**lint**
+Run linting rules w/o attempting to fix them
+
+```shell
+$ poetry run lint
+```
+
+
+**lint:fix**
+
+Run lint rules against all local python files and attempt to fix where possible.
+
+
+```shell
+$ poetry run lint:fix
+```
+
+**test**:
+
+Runs all unit tests and generates coverage reports
+
+```shell
+poetry run test
+```
 ## License
 
 MIT © [LogDNA](https://logdna.com/)
+Copyright © 2017 [LogDNA][], released under an MIT license. See the [LICENSE](./LICENSE) file and [https://opensource.org/licenses/MIT](https://opensource.org/licenses/MIT)
+
 
 *Happy Logging!*
+
+[bool]: https://docs.python.org/3/library/stdtypes.html#boolean-values
+[dict]: https://docs.python.org/3/library/stdtypes.html#mapping-types-dict
+[int]: https://docs.python.org/3/library/functions.html#int
+[float]: https://docs.python.org/3/library/functions.html#float
+[string]: https://docs.python.org/3/library/string.html
+[list]: https://docs.python.org/3/library/stdtypes.html#list
+[time.time()]: https://docs.python.org/3/library/time.html?#time.time
+[poetry]: https://python-poetry.org
+[LogDNA]: https://logdna.com/
+[LogRecord]: https://docs.python.org/2/library/logging.html#logrecord-objects
+[fileConfig]: https://docs.python.org/2/library/logging.config.html#logging.config.fileConfig
