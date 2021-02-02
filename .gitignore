@@ -8,3 +8,6 @@ logdna.egg-info/
 LogDNAHandler.log
 bin
 .installed.cfg
+coverage/
+.coverage
+Session.vim

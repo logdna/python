@@ -15,7 +15,9 @@ jobs:
       - image: circleci/python:3
     steps:
       - checkout
-      - run: python logdnaHandlerTest.py
+      - run: poetry install
+      - run: poetry run lint
+      - run: poetry run test
   build:
     docker:
       - image: circleci/python:3
