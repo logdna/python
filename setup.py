@@ -7,20 +7,19 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), 'rb') as f:
     long_description = f.read().decode('utf-8')
 
-with open("%s/logdna/VERSION" % this_directory) as f:
-    version = f.read().strip('\n')
+__VERSION__ = "1.5.4"
 
 setup(
     name='logdna',
     packages=['logdna'],
     package_data={'': ['VERSION']},
-    version=version,
+    version=__VERSION__,
     description='A Python Package for Sending Logs to LogDNA',
     author='LogDNA Inc.',
     author_email='help@logdna.com',
     license='MIT',
     url='https://github.com/logdna/python',
-    download_url=('https://github.com/logdna/python/tarball/%s' % (version)),
+    download_url=('https://github.com/logdna/python/tarball/%s' % (__VERSION__)),
     keywords=['logdna', 'logging', 'logs', 'python', 'logdna.com', 'logger'],
     install_requires=[
         'requests',

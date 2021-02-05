@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "logdna"
 version = "1.5.4"
-description = "A python package for sending logs"
+description = 'A Python Package for Sending Logs to LogDNA'
 authors = ["logdna <help@logdna.com>"]
 license = "MIT"
 
@@ -10,19 +10,50 @@ python = "^3.6"
 requests = "^2.25.1"
 
 [tool.poetry.dev-dependencies]
-coverage = "^5.4"
+coverage = {extras = ["toml"], version = "^5.4"}
 "tap.py" = "^3.0"
 ipdb = "^0.13.4"
 flake8 = "^3.8.4"
 yapf = "^0.30.0"
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
+python-semantic-release = "^7.13.2"
 
 [tool.poetry.scripts]
 test = "scripts.test:run"
+release = "scripts.release:run"
 lint = "scripts.lint:run"
 "lint:fix" =  "scripts.lint:fix"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = "tests"
 
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.semantic_release]
+version_source = "tag"
+version_toml = "pyproject.toml:tool.poetry.version"
+branch = "master"
+changelog_file = "CHANGELOG.md"
+
+[tool.coverage.run]
+branch = true
+source = ["logdna"]
+
+[tool.coverage.report]
+fail_under = 68
+show_missing = true
+
+[tool.coverage.json]
+output = "coverage/coverage.json"
+pretty_print = true
+
+[tool.coverage.xml]
+output = "coverage/coverage.xml"
+
+[tool.coverage.html]
+directory = "coverage"
+show_contexts = true
