@@ -42,6 +42,15 @@
         "maintenance",
         "test"
       ]
+    },
+    {
+      "login": "mikehu",
+      "name": "Mike Hu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/981800?v=4",
+      "profile": "https://github.com/mikehu",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
