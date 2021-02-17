@@ -20,6 +20,17 @@
         "doc",
         "test"
       ]
+    },
+    {
+      "login": "smusali",
+      "name": "Samir Musali",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34287490?v=4",
+      "profile": "https://github.com/smusali",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
     }
   ],
   "contributorsPerLine": 7
