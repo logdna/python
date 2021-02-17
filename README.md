@@ -1,6 +1,6 @@
 <p align="center">
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
   <a href="https://app.logdna.com">
     <img height="95" width="202" src="https://raw.githubusercontent.com/logdna/artwork/master/logo%2Bpython.png">
@@ -381,6 +381,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="http://justrocketscience.com/"><img src="https://avatars.githubusercontent.com/u/604528?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Christian Hotz-Behofsits</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=inkrement" title="Code">💻</a> <a href="https://github.com/logdna/python/issues?q=author%3Ainkrement" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://www.kinoarts.com/blog/"><img src="https://avatars.githubusercontent.com/u/108118?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kurtiss Hare</b></sub></a><br /><a href="https://github.com/logdna/python/issues?q=author%3Akurtiss" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://twitter.com/rudyryk"><img src="https://avatars.githubusercontent.com/u/4500?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Alexey Kinev</b></sub></a><br /><a href="https://github.com/logdna/python/issues?q=author%3Arudyryk" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
