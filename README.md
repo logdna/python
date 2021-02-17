@@ -1,12 +1,13 @@
 <p align="center">
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-18-orange.svg?style=flat-square)](#contributors-)
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
   <a href="https://app.logdna.com">
     <img height="95" width="202" src="https://raw.githubusercontent.com/logdna/artwork/master/logo%2Bpython.png">
   </a>
   <p align="center">Python package for logging to <a href="https://app.logdna.com">LogDNA</a></p>
 </p>
+
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-18-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ---
 
@@ -326,7 +327,7 @@ The time in seconds since the epoch to use for the log timestamp. It must be wit
 This project makes use of the [poetry][] package manager for local development.
 
 ```shell
-$ poetry isntall
+$ poetry install
 ```
 
 ### Scripts

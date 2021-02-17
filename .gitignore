@@ -1,4 +1,4 @@
-**/*.pyc
+*.pyc
 **/*cache*
 build/
 develop-eggs
@@ -11,3 +11,4 @@ bin
 coverage/
 .coverage
 Session.vim
+.cache
