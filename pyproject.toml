@@ -17,6 +17,7 @@ flake8 = "^3.8.4"
 yapf = "^0.30.0"
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
+taskipy = "^1.6.0"
 
 [tool.poetry.scripts]
 test = "scripts.test:run"
