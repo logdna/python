@@ -157,6 +157,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "kurtiss",
+      "name": "Kurtiss Hare",
+      "avatar_url": "https://avatars.githubusercontent.com/u/108118?v=4",
+      "profile": "http://www.kinoarts.com/blog/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
