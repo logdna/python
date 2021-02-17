@@ -63,6 +63,16 @@
         "test",
         "tool"
       ]
+    },
+    {
+      "login": "utek",
+      "name": "Łukasz Bołdys (Lukasz Boldys)",
+      "avatar_url": "https://avatars.githubusercontent.com/u/128036?v=4",
+      "profile": "http://dev.utek.pl/",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
