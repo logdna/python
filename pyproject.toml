@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "logdna"
 version = "1.5.4"
-description = "A python package for sending logs"
+description = 'A Python Package for Sending Logs to LogDNA'
 authors = ["logdna <help@logdna.com>"]
 license = "MIT"
 
@@ -19,11 +19,33 @@ pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
 taskipy = "^1.6.0"
 
-[tool.poetry.scripts]
-test = "scripts.test:run"
-lint = "scripts.lint:run"
-"lint:fix" =  "scripts.lint:fix"
+[tool.taskipy.tasks]
+pre_test = "mkdir coverage -p"
+test = "pytest --junitxml=coverage/test.xml --cov=logdna --cov-report=html"
+post_test = "python scripts/json_coverage.py"
+lint = "flake8 --doctests"
+"lint:fix" =  "yapf -r -i logdna scripts tests"
+"post_lint:fix" = "task lint"
 
 [build-system]
 requires = ["poetry>=0.12"]
 build-backend = "poetry.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+testpaths = "tests"
+
+[tool.coverage.run]
+branch = true
+source = ["logdna"]
+
+[tool.coverage.report]
+fail_under = 67
+show_missing = true
+
+[tool.coverage.json]
+output = "coverage/coverage.json"
+
+[tool.coverage.html]
+directory = "coverage"
+show_contexts = true

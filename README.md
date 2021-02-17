@@ -325,13 +325,17 @@ The time in seconds since the epoch to use for the log timestamp. It must be wit
 
 This project makes use of the [poetry][] package manager for local development.
 
+```shell
+$ poetry isntall
+```
+
 ### Scripts
 
 **lint**
 Run linting rules w/o attempting to fix them
 
 ```shell
-$ poetry run lint
+$ poetry run task lint
 ```
 
 
@@ -341,7 +345,7 @@ Run lint rules against all local python files and attempt to fix where possible.
 
 
 ```shell
-$ poetry run lint:fix
+$ poetry run task lint:fix
 ```
 
 **test**:
@@ -349,7 +353,7 @@ $ poetry run lint:fix
 Runs all unit tests and generates coverage reports
 
 ```shell
-poetry run test
+poetry run task test
 ```
 
 ## Contributors ✨
