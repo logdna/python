@@ -1,6 +1,6 @@
 <p align="center">
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
   <a href="https://app.logdna.com">
     <img height="95" width="202" src="https://raw.githubusercontent.com/logdna/artwork/master/logo%2Bpython.png">
@@ -364,6 +364,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/respectus"><img src="https://avatars.githubusercontent.com/u/1046364?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Muaz Siddiqui</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=respectus" title="Code">💻</a> <a href="https://github.com/logdna/python/commits?author=respectus" title="Documentation">📖</a> <a href="https://github.com/logdna/python/commits?author=respectus" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/smusali"><img src="https://avatars.githubusercontent.com/u/34287490?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Samir Musali</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=smusali" title="Code">💻</a> <a href="https://github.com/logdna/python/commits?author=smusali" title="Documentation">📖</a> <a href="https://github.com/logdna/python/commits?author=smusali" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://github.com/vilyapilya"><img src="https://avatars.githubusercontent.com/u/17367511?v=4?s=100" width="100px;" alt=""/><br /><sub><b>vilyapilya</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=vilyapilya" title="Code">💻</a> <a href="#maintenance-vilyapilya" title="Maintenance">🚧</a> <a href="https://github.com/logdna/python/commits?author=vilyapilya" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/mikehu"><img src="https://avatars.githubusercontent.com/u/981800?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mike Hu</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=mikehu" title="Documentation">📖</a></td>
   </tr>
 </table>
 
