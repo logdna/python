@@ -92,6 +92,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "danmaas",
+      "name": "Dan Maas",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9013104?v=4",
+      "profile": "https://www.medium.com/@dmaas",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
