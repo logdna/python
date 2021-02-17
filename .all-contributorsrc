@@ -154,7 +154,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/604528?v=4",
       "profile": "http://justrocketscience.com/",
       "contributions": [
-        "code"
+        "code",
+        "bug"
       ]
     }
   ],
