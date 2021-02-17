@@ -1,6 +1,6 @@
 <p align="center">
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
   <a href="https://app.logdna.com">
     <img height="95" width="202" src="https://raw.githubusercontent.com/logdna/artwork/master/logo%2Bpython.png">
@@ -368,6 +368,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/LYHuang"><img src="https://avatars.githubusercontent.com/u/14082239?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mike Huang</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=LYHuang" title="Code">💻</a> <a href="https://github.com/logdna/python/issues?q=author%3ALYHuang" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://www.medium.com/@dmaas"><img src="https://avatars.githubusercontent.com/u/9013104?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dan Maas</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=danmaas" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/dchai76"><img src="https://avatars.githubusercontent.com/u/13873467?v=4?s=100" width="100px;" alt=""/><br /><sub><b>DChai</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=dchai76" title="Documentation">📖</a></td>
   </tr>
 </table>
 

@@ -101,6 +101,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "dchai76",
+      "name": "DChai",
+      "avatar_url": "https://avatars.githubusercontent.com/u/13873467?v=4",
+      "profile": "https://github.com/dchai76",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
