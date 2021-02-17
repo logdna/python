@@ -379,7 +379,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/btashton"><img src="https://avatars.githubusercontent.com/u/173245?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brennan Ashton</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=btashton" title="Code">💻</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="http://justrocketscience.com/"><img src="https://avatars.githubusercontent.com/u/604528?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Christian Hotz-Behofsits</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=inkrement" title="Code">💻</a></td>
+    <td align="center"><a href="http://justrocketscience.com/"><img src="https://avatars.githubusercontent.com/u/604528?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Christian Hotz-Behofsits</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=inkrement" title="Code">💻</a> <a href="https://github.com/logdna/python/issues?q=author%3Ainkrement" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
