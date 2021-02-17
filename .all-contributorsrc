@@ -110,6 +110,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "jdemaeyer",
+      "name": "Jakob de Maeyer ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/10531844?v=4",
+      "profile": "https://naboa.de/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
