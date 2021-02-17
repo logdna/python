@@ -1,6 +1,6 @@
 <p align="center">
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-14-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-15-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
   <a href="https://app.logdna.com">
     <img height="95" width="202" src="https://raw.githubusercontent.com/logdna/artwork/master/logo%2Bpython.png">
@@ -373,6 +373,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/sataloger"><img src="https://avatars.githubusercontent.com/u/359111?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Andrey Babak</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=sataloger" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/mike-spainhower"><img src="https://avatars.githubusercontent.com/u/380032?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mike S</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=SpainTrain" title="Code">💻</a> <a href="https://github.com/logdna/python/commits?author=SpainTrain" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/btashton"><img src="https://avatars.githubusercontent.com/u/173245?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brennan Ashton</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=btashton" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="http://justrocketscience.com/"><img src="https://avatars.githubusercontent.com/u/604528?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Christian Hotz-Behofsits</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=inkrement" title="Code">💻</a></td>
   </tr>
 </table>
 
