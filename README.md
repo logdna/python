@@ -1,6 +1,6 @@
 <p align="center">
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-8-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
   <a href="https://app.logdna.com">
     <img height="95" width="202" src="https://raw.githubusercontent.com/logdna/artwork/master/logo%2Bpython.png">
@@ -364,6 +364,9 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://codedependant.net/"><img src="https://avatars.githubusercontent.com/u/148561?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Eric Satterwhite</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=esatterwhite" title="Code">💻</a> <a href="https://github.com/logdna/python/commits?author=esatterwhite" title="Documentation">📖</a> <a href="https://github.com/logdna/python/commits?author=esatterwhite" title="Tests">⚠️</a> <a href="#tool-esatterwhite" title="Tools">🔧</a></td>
     <td align="center"><a href="http://dev.utek.pl/"><img src="https://avatars.githubusercontent.com/u/128036?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Łukasz Bołdys (Lukasz Boldys)</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=utek" title="Code">💻</a> <a href="https://github.com/logdna/python/issues?q=author%3Autek" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/baronomasia"><img src="https://avatars.githubusercontent.com/u/4133158?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Ryan</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=baronomasia" title="Documentation">📖</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/LYHuang"><img src="https://avatars.githubusercontent.com/u/14082239?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Mike Huang</b></sub></a><br /><a href="https://github.com/logdna/python/commits?author=LYHuang" title="Code">💻</a> <a href="https://github.com/logdna/python/issues?q=author%3ALYHuang" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
