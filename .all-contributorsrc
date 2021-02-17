@@ -73,6 +73,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "baronomasia",
+      "name": "Ryan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4133158?v=4",
+      "profile": "https://github.com/baronomasia",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
