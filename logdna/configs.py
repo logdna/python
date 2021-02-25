@@ -1,6 +1,7 @@
 from os import path
+from os import sep
 
-with open("%s/VERSION" % path.abspath(path.dirname(__file__))) as f:
+with open("{p}{s}VERSION".format(p=path.abspath(path.dirname(__file__)),s=sep)) as f:
     version = f.read().strip('\n')
 
 defaults = {
