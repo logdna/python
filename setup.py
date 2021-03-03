@@ -8,8 +8,9 @@ this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), 'rb') as f:
     long_description = f.read().decode('utf-8')
 
-with open("{p}{s}logdna{s}VERSION" \
-    .format(p=this_directory, s=sep)) as f:
+with open("{p}{s}logdna{s}VERSION"
+          .format(p=this_directory, s=sep)
+          ) as f:
     version = f.read().strip('\n')
 
 setup(
