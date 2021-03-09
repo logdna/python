@@ -19,11 +19,13 @@ def json_coverage():
     totals = report.get('totals')
     summary = {
         'lines': {
-            'total': totals['covered_lines'] + totals['missing_lines'],
-            'covered': totals['covered_lines'],
-            'pct': totals['covered_lines'] / (
-                totals['covered_lines'] + totals['missing_lines']
-            ) * 100
+            'total':
+            totals['covered_lines'] + totals['missing_lines'],
+            'covered':
+            totals['covered_lines'],
+            'pct':
+            totals['covered_lines'] /
+            (totals['covered_lines'] + totals['missing_lines']) * 100
         },
         'statements': {
             'total': None,

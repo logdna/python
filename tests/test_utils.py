@@ -42,9 +42,7 @@ class IPTest(unittest.TestCase):
         self.assertEqual(get_ip(), '127.0.0.1',
                          'default to localhost on error')
 
-    @patch(
-        'socket.socket',
-        **{'return_value.getsockname.return_value': [IP, VIP]}
-    )
+    @patch('socket.socket',
+           **{'return_value.getsockname.return_value': [IP, VIP]})
     def test_get_ip_default(self, _):
         self.assertEqual(get_ip(), IP, 'default to localhost on error')
