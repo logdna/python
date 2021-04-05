@@ -12,3 +12,5 @@ coverage/
 .coverage
 Session.vim
 .cache
+pypoetry/
+pip/
