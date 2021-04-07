@@ -52,7 +52,7 @@ pipeline {
       }
 
       environment {
-        GITHUB_TOKEN = credentials('github-api-token')
+        GH_TOKEN = credentials('github-api-token')
         PYPI_TOKEN = credentials('pypi-token')
       }
 
