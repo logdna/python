@@ -2,6 +2,9 @@
 
 <!--next-version-placeholder-->
 
+## v1.7.0 (2021-04-07)
+
+
 ## v1.6.0 (2021-04-07)
 ### Feature
 * **ci:** Enable releases through semantic release ([`9e4b1c0`](https://github.com/logdna/python/commit/9e4b1c0a43bc0941ba4fb336ea12a3f497622ee6))
