@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "logdna"
-version = "1.8.0"
+version = "1.9.0"
 description = 'A Python Package for Sending Logs to LogDNA'
 authors = ["logdna <help@logdna.com>"]
 license = "MIT"
