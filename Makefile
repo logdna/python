@@ -40,7 +40,7 @@ help: ## Show this help, includes list of all actions.
 
 .PHONY:clean
 clean: ## purge build time artifacts
-	rm -rf dist/ build/ coverage/ pypoetry/ pip/ .cache
+	rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
 
 .PHONY:changelog
 changelog: ## print the next version of the change log to stdout
