@@ -28,7 +28,7 @@ taskipy = "^1.6.0"
 python-semantic-release = "^7.15.3"
 
 [tool.taskipy.tasks]
-pre_test = "mkdir coverage -p"
+pre_test = "mkdir -p coverage"
 test = "pytest --junitxml=coverage/test.xml --cov=logdna --cov-report=html"
 post_test = "python scripts/json_coverage.py"
 lint = "flake8 --doctests"
