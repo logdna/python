@@ -5,7 +5,6 @@ import socket
 import sys
 import threading
 import time
-from functools import reduce
 
 from .configs import defaults
 from .utils import sanitize_meta, get_ip
@@ -22,10 +21,10 @@ class LogDNAHandler(logging.Handler):
 
         self.key = key
         self.buf = []
+        self.buf_size = 0
         self.secondary = []
         self.exception_flag = False
         self.flusher = None
-        self.max_length = defaults['MAX_LINE_LENGTH']
 
         self.hostname = options.get('hostname', socket.gethostname())
         self.ip = options.get('ip', get_ip())
@@ -40,15 +39,14 @@ class LogDNAHandler(logging.Handler):
         self.include_standard_meta = options.get('include_standard_meta',
                                                  False)
         self.index_meta = options.get('index_meta', False)
-        self.flush_limit = options.get('flush_limit',
-                                       defaults['FLUSH_BYTE_LIMIT'])
-        self.flush_interval_secs = options.get('flush_interval',
-                                               defaults['FLUSH_INTERVAL_SECS'])
-        self.retry_interval_secs = options.get('retry_interval_secs',
-                                               defaults['RETRY_INTERVAL_SECS'])
+        self.flush_limit = options.get('flush_limit', defaults['FLUSH_LIMIT'])
+        self.flush_interval = options.get('flush_interval',
+                                          defaults['FLUSH_INTERVAL'])
+        self.retry_interval = options.get('retry_interval',
+                                          defaults['RETRY_INTERVAL'])
         self.tags = options.get('tags', [])
-        self.buf_retention_byte_limit = options.get(
-            'buf_retention_limit', defaults['BUF_RETENTION_BYTE_LIMIT'])
+        self.buf_retention_limit = options.get('buf_retention_limit',
+                                               defaults['BUF_RETENTION_LIMIT'])
         self.user_agent = options.get('user_agent', defaults['USER_AGENT'])
 
         if isinstance(self.tags, str):
@@ -58,43 +56,36 @@ class LogDNAHandler(logging.Handler):
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
 
-    # TODO(esatterwhite): complexity too high (8)
-    def buffer_log(self, message):
-        if message and message['line']:
-            if len(message['line']) > self.max_length:
-                message['line'] = message[
-                    'line'][:self.max_length] + ' (cut off, too long...)'
-                if self.verbose in ['true', 'debug', 'd']:
-                    self.internalLogger.debug(
-                        'Line was longer than %s chars and was truncated.',
-                        self.max_length)
+    def start_flusher(self):
+        interval = (self.retry_interval
+                    if self.exception_flag else self.flush_interval)
+        self.flusher = threading.Timer(float(interval / 1000), self.flush)
+        self.flusher.start()
 
+    def buffer_log(self, message):
         # Attempt to acquire lock to write to buf
         # otherwise write to secondary as flush occurs
         if self.lock.acquire(blocking=False):
-            buf_size = reduce(lambda x, y: x + len(y['line']), self.buf, 0)
-
-            if buf_size + len(message['line']) < self.buf_retention_byte_limit:
+            if self.buf_size + len(message['line']) < self.buf_retention_limit:
                 self.buf.append(message)
+                self.buf_size += len(message['line'])
             else:
                 self.internalLogger.debug(
                     'The buffer size exceeded the limit: %s',
-                    self.buf_retention_byte_limit)
+                    self.buf_retention_limit)
             self.lock.release()
 
-            if buf_size >= self.flush_limit and not self.exception_flag:
+            if self.buf_size >= self.flush_limit and not self.exception_flag:
                 self.flush()
         else:
             self.secondary.append(message)
 
         if not self.flusher:
-            interval = (self.retry_interval_secs
-                        if self.exception_flag else self.flush_interval_secs)
-            self.flusher = threading.Timer(interval, self.flush)
-            self.flusher.start()
+            self.start_flusher()
 
     def clean_after_success(self):
         del self.buf[:]
+        self.buf_size = 0
         self.exception_flag = False
         if self.flusher:
             self.flusher.cancel()
@@ -140,8 +131,7 @@ class LogDNAHandler(logging.Handler):
             self.lock.release()
         else:
             if not self.flusher:
-                self.flusher = threading.Timer(1, self.flush)
-                self.flusher.start()
+                self.start_flusher()
 
     # TODO(esatterwhite): complexity too high (14)
     def emit(self, record):  # noqa: C901

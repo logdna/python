@@ -84,8 +84,8 @@ class LogDNAHandlerTest(unittest.TestCase):
             'mac': 'C0:FF:EE:C0:FF:EE',
             'buf_retention_limit': 50,
             'equest_timeout': 10,
-            'flush_interval': 1,
-            'retry_interval_secs': 1
+            'flush_interval': 1000,
+            'retry_interval': 1000
         }
 
         handler = LogDNAHandler(LOGDNA_API_KEY, options)
