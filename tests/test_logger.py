@@ -49,8 +49,8 @@ class LogDNAHandlerTest(unittest.TestCase):
         server_thread.join()
         logdna_thread.join()
 
-        self.assertEqual(len(expectedLines), 1)
-        self.assertIn(line, expectedLines)
+        self.assertEqual(len(expectedLines), 1, 'line count')
+        self.assertIn(line, expectedLines, 'actual line')
         logger.removeHandler(handler)
 
     def messages_preserved_if_excp(self):
@@ -72,7 +72,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         server_thread.join()
         logdna_thread.join()
 
-        self.assertEqual(len(handler.buf), 1)
+        self.assertEqual(len(handler.buf), 1, 'line count')
         logger.removeHandler(handler)
 
     def stops_retention_when_buf_is_full(self):
@@ -99,8 +99,8 @@ class LogDNAHandlerTest(unittest.TestCase):
         server_thread.join()
         logdna_thread.join()
 
-        self.assertEqual(len(handler.buf), 1)
-        self.assertNotEqual(handler.buf[0]['line'], lineTwo)
+        self.assertEqual(len(handler.buf), 1, 'line count')
+        self.assertNotEqual(handler.buf[0]['line'], lineTwo, 'test inequality')
         logger.removeHandler(handler)
 
     def test_run_tests(self):
