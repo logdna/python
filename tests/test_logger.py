@@ -1,112 +1,89 @@
-import json
+import logging
 import unittest
 
-from http.server import BaseHTTPRequestHandler
 from logdna import LogDNAHandler
-from .mock.server import get_port, start_server
-from .mock.log import logger, info, LOGDNA_API_KEY
+from concurrent.futures import ThreadPoolExecutor
+from logdna.configs import defaults
 
 expectedLines = []
-
-
-class SuccessfulRequestHandler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        body = self.rfile.read(content_length)
-        self.send_response(200)
-
-        self.end_headers()
-        body = json.loads(body)['ls']
-        for keys in body:
-            expectedLines.append(keys['line'])
-
-
-class FailedRequestHandler(BaseHTTPRequestHandler):
-    def do_POST(self):
-        content_length = int(self.headers['Content-Length'])
-        self.rfile.read(content_length)
-        self.send_response(400)
-        self.end_headers()
+LOGDNA_API_KEY = '< YOUR INGESTION KEY HERE >'
+logger = logging.getLogger('logdna')
+logger.setLevel(logging.INFO)
 
 
 class LogDNAHandlerTest(unittest.TestCase):
-    def server_recieves_messages(self):
-        port = get_port()
+    def handler_test(self):
         options = {
             'hostname': 'localhost',
-            'url': 'http://localhost:{0}'.format(port),
-            'ip': '10.0.1.1',
-            'mac': 'C0:FF:EE:C0:FF:EE'
-        }
-
-        handler = LogDNAHandler(LOGDNA_API_KEY, options)
-        logger.addHandler(handler)
-        line = "python python python"
-
-        server_thread = start_server(port, SuccessfulRequestHandler)
-        logdna_thread = info(line)
-
-        server_thread.join()
-        logdna_thread.join()
-
-        self.assertEqual(len(expectedLines), 1, 'line count')
-        self.assertIn(line, expectedLines, 'actual line')
-        logger.removeHandler(handler)
-
-    def messages_preserved_if_excp(self):
-        port = get_port()
-        options = {
-            'hostname': 'localhost',
-            'url': 'http://localhost:{0}'.format(port),
-            'ip': '10.0.1.1',
-            'mac': 'C0:FF:EE:C0:FF:EE'
-        }
-
-        handler = LogDNAHandler(LOGDNA_API_KEY, options)
-        logger.addHandler(handler)
-        line = "second test. server fails"
-
-        server_thread = start_server(port, FailedRequestHandler)
-        logdna_thread = info(line)
-
-        server_thread.join()
-        logdna_thread.join()
-
-        self.assertEqual(len(handler.buf), 1, 'line count')
-        logger.removeHandler(handler)
-
-    def stops_retention_when_buf_is_full(self):
-        port = get_port()
-        options = {
-            'hostname': 'localhost',
-            'url': 'http://localhost:{0}'.format(port),
             'ip': '10.0.1.1',
             'mac': 'C0:FF:EE:C0:FF:EE',
-            'buf_retention_limit': 50,
-            'equest_timeout': 10,
-            'flush_interval': 1000,
-            'retry_interval': 1000
+            'tags': 'sample,test'
         }
 
         handler = LogDNAHandler(LOGDNA_API_KEY, options)
-        logger.addHandler(handler)
-        line = "when buffer grows bigger than we want"
-        lineTwo = "when buffer grows bigger than we want. And more and more"
+        self.assertIsInstance(handler, logging.Handler)
+        self.assertIsInstance(handler.internal_handler, logging.StreamHandler)
+        self.assertIsNotNone(handler.internalLogger)
+        self.assertEqual(handler.key, LOGDNA_API_KEY)
+        self.assertEqual(handler.hostname, options['hostname'])
+        self.assertEqual(handler.ip, options['ip'])
+        self.assertEqual(handler.mac, options['mac'])
+        self.assertEqual(handler.loglevel, 'info')
+        self.assertEqual(handler.app, '')
+        self.assertEqual(handler.env, '')
+        self.assertEqual(handler.tags, options['tags'].split(','))
 
-        server_thread = start_server(port, FailedRequestHandler)
-        logdna_thread = info(line, lineTwo)
+        # Set the Connection Variables
+        self.assertEqual(handler.url, defaults['LOGDNA_URL'])
+        self.assertEqual(handler.request_timeout,
+                         defaults['DEFAULT_REQUEST_TIMEOUT'])
+        self.assertEqual(handler.user_agent, defaults['USER_AGENT'])
+        self.assertEqual(handler.max_retry_attempts,
+                         defaults['MAX_RETRY_ATTEMPTS'])
+        self.assertEqual(handler.max_retry_jitter,
+                         defaults['MAX_RETRY_JITTER'])
+        self.assertEqual(handler.max_concurrent_requests,
+                         defaults['MAX_CONCURRENT_REQUESTS'])
+        self.assertEqual(handler.retry_interval_secs,
+                         defaults['RETRY_INTERVAL_SECS'])
 
-        server_thread.join()
-        logdna_thread.join()
+        # Set the Flush-related Variables
+        self.assertEqual(handler.buf, [])
+        self.assertEqual(handler.buf_size, 0)
+        self.assertEqual(handler.secondary, [])
+        self.assertFalse(handler.exception_flag)
+        self.assertIsNone(handler.flusher)
+        self.assertFalse(handler.include_standard_meta)
+        self.assertFalse(handler.index_meta)
+        self.assertEqual(handler.flush_limit, defaults['FLUSH_LIMIT'])
+        self.assertEqual(handler.flush_interval_secs,
+                         defaults['FLUSH_INTERVAL_SECS'])
+        self.assertEqual(handler.buf_retention_limit,
+                         defaults['BUF_RETENTION_LIMIT'])
 
-        self.assertEqual(len(handler.buf), 1, 'line count')
-        self.assertNotEqual(handler.buf[0]['line'], lineTwo, 'test inequality')
-        logger.removeHandler(handler)
+        # Set up the Thread Pools
+        self.assertIsInstance(handler.worker_thread_pool, ThreadPoolExecutor)
+        self.assertIsInstance(handler.request_thread_pool, ThreadPoolExecutor)
+        self.assertEqual(handler.level, logging.DEBUG)
+
+    def flusher_test(self):
+        options = {
+            'hostname': 'localhost',
+            'ip': '10.0.1.1',
+            'mac': 'C0:FF:EE:C0:FF:EE',
+            'tags': 'sample,test'
+        }
+
+        handler = LogDNAHandler(LOGDNA_API_KEY, options)
+        self.assertIsNone(handler.flusher)
+        handler.start_flusher()
+        self.assertIsNotNone(handler.flusher)
+        handler.close_flusher()
+        self.assertIsNone(handler.flusher)
 
     def test_run_tests(self):
-        self.server_recieves_messages()
-        self.messages_preserved_if_excp()
-        self.stops_retention_when_buf_is_full()
+        self.handler_test()
+        self.flusher_test()
 
 
 if __name__ == '__main__':
