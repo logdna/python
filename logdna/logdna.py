@@ -29,7 +29,7 @@ class LogDNAHandler(logging.Handler):
         self.hostname = options.get('hostname', socket.gethostname())
         self.ip = options.get('ip', get_ip())
         self.mac = options.get('mac', None)
-        self.level = options.get('level', 'info')
+        self.loglevel = options.get('level', 'info')
         self.app = options.get('app', '')
         self.env = options.get('env', '')
         self.tags = options.get('tags', [])
@@ -49,8 +49,8 @@ class LogDNAHandler(logging.Handler):
                                             defaults['MAX_RETRY_JITTER'])
         self.max_concurrent_requests = options.get(
             'max_concurrent_requests', defaults['MAX_CONCURRENT_REQUESTS'])
-        self.retry_interval = options.get('retry_interval',
-                                          defaults['RETRY_INTERVAL'])
+        self.retry_interval_secs = options.get('retry_interval_secs',
+                                               defaults['RETRY_INTERVAL_SECS'])
 
         # Set the Flush-related Variables
         self.buf = []
@@ -62,8 +62,8 @@ class LogDNAHandler(logging.Handler):
                                                  False)
         self.index_meta = options.get('index_meta', False)
         self.flush_limit = options.get('flush_limit', defaults['FLUSH_LIMIT'])
-        self.flush_interval = options.get('flush_interval',
-                                          defaults['FLUSH_INTERVAL'])
+        self.flush_interval_secs = options.get('flush_interval',
+                                               defaults['FLUSH_INTERVAL_SECS'])
         self.buf_retention_limit = options.get('buf_retention_limit',
                                                defaults['BUF_RETENTION_LIMIT'])
 
@@ -77,9 +77,8 @@ class LogDNAHandler(logging.Handler):
 
     def start_flusher(self):
         if not self.flusher:
-            interval = (self.retry_interval
-                        if self.exception_flag else self.flush_interval)
-            self.flusher = threading.Timer(float(interval / 1000), self.flush)
+            self.flusher = threading.Timer(self.flush_interval_secs,
+                                           self.flush)
             self.flusher.start()
 
     def close_flusher(self):
@@ -168,7 +167,7 @@ class LogDNAHandler(logging.Handler):
                 self.clean_after_success()
                 break
 
-            sleep_time = self.retry_interval * (1 << (retries - 1))
+            sleep_time = self.retry_interval_secs * (1 << (retries - 1))
             sleep_time += self.max_retry_jitter
             time.sleep(sleep_time)
 
@@ -224,7 +223,7 @@ class LogDNAHandler(logging.Handler):
             'hostname': self.hostname,
             'timestamp': int(time.time() * 1000),
             'line': msg,
-            'level': record['levelname'] or self.level,
+            'level': record['levelname'] or self.loglevel,
             'app': self.app or record['module'],
             'env': self.env
         }
