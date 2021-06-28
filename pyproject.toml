@@ -29,7 +29,7 @@ python-semantic-release = "^7.15.3"
 
 [tool.taskipy.tasks]
 pre_test = "mkdir -p coverage"
-test = "pytest --junitxml=coverage/test.xml --cov=logdna --cov-report=html"
+test = "pytest --junitxml=coverage/test.xml --cov=logdna --cov-report=html --verbose"
 post_test = "python scripts/json_coverage.py"
 lint = "flake8 --doctests"
 "lint:fix" =  "yapf -r -i logdna scripts tests"
@@ -49,7 +49,7 @@ branch = true
 source = ["logdna"]
 
 [tool.coverage.report]
-fail_under = 40
+fail_under = 75
 show_missing = true
 
 [tool.coverage.json]
