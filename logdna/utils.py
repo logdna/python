@@ -10,7 +10,24 @@ def is_jsonable(obj):
         return False
 
 
-def sanitize_meta(meta):
+def normalize_list_option(options, key):
+    value = options.get(key, [])
+    if isinstance(value, str):
+        value = [val.strip() for val in value.split(',')]
+    elif not isinstance(value, list):
+        value = []
+    return value
+
+
+def sanitize_meta(meta, index_meta=False):
+    if not index_meta:
+        if is_jsonable(meta):
+            return json.dumps(meta)
+
+        return {
+            '__errors': 'Meta cannot be serialized into JSON-formatted string'
+        }
+
     keys_to_sanitize = []
     for key, value in meta.items():
         if not is_jsonable(value):

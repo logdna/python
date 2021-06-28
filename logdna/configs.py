@@ -11,6 +11,7 @@ defaults = {
     'MAX_CONCURRENT_REQUESTS': 10,
     'MAX_RETRY_ATTEMPTS': 3,
     'MAX_RETRY_JITTER': 0.5,
+    'META_FIELDS': ['args', 'name', 'pathname', 'lineno'],
     'LOGDNA_URL': 'https://logs.logdna.com/logs/ingest',
     'BUF_RETENTION_LIMIT': 4 * 1024 * 1024,
     'RETRY_INTERVAL_SECS': 5,

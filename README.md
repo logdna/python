@@ -67,10 +67,9 @@ _**Required**_
 * [LogDNA Ingestion Key](https://app.logdna.com/manage/profile)
 
 _**Optional**_
-* Hostname - ([string][]) - max length 32 chars
+* Hostname - ([string][])
 * MAC Address - ([string][])
 * IP Address - ([string][])
-* Max Length - ([bool][]) - formatted as options['max_length']
 * Index Meta - ([bool][]) - formatted as options['index_meta']
 
 ## Usage
@@ -156,7 +155,6 @@ The [LogDNA API Key](https://app.logdna.com/manage/profile) associated with your
 * Type: [string][]
 * Default: `''`
 * Values: `YourCustomApp`
-* Max Length: `32`
 
 The default app passed along with every log sent through this instance.
 
@@ -166,7 +164,6 @@ The default app passed along with every log sent through this instance.
 * Type: [string][]
 * Default: `''`
 * Values: `YourCustomEnv`
-* Max Length: `32`
 
 The default env passed along with every log sent through this instance.
 
@@ -176,7 +173,6 @@ The default env passed along with every log sent through this instance.
 * Type: [string][]
 * Default: `''`
 * Values: `YourCustomHostname`
-* Max Length: `32`
 
 The default hostname passed along with every log sent through this instance.
 
@@ -190,6 +186,7 @@ Python [LogRecord][] objects includes language-specific information that may be 
 Setting `include_standard_meta` to `True` automatically populates meta objects with `name`, `pathname`, and `lineno`
 from the [LogRecord][].
 
+*WARNING* This option is deprecated and will be removed in the upcoming major release.
 
 ##### index_meta
 
@@ -203,14 +200,12 @@ If this option is set to True then meta objects are parsed and searchable up to 
 
 *WARNING* If this option is True, your metadata objects MUST have consistent types across all log messages or the metadata object may not be parsed properly.
 
-
 ##### level
 
 * _Optional_
 * Type: [string][]
 * Default: `Info`
 * Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
-* Max Length: `32`
 
 The default level passed along with every log sent through this instance.
 
@@ -247,6 +242,14 @@ List of tags used to dynamically group hosts.  More information on tags is avail
 
 A custom ingestion endpoint to stream log lines into.
 
+##### custom_fields
+
+* _Optional_
+* Type: [list][]&lt;[string][]&gt;
+* Default: `['args', 'name', 'pathname', 'lineno']`
+
+List of fields out of `record` object to include in the `meta` object. By default, `args`, `name`, `pathname`, and `lineno` will be included.
+
 ### log(line, [options])
 
 #### line
@@ -254,7 +257,6 @@ A custom ingestion endpoint to stream log lines into.
 * _Required_
 * Type: [string][]
 * Default: `''`
-* Max Length: `32000`
 
 The log line to be sent to LogDNA.
 
@@ -266,7 +268,6 @@ The log line to be sent to LogDNA.
 * Type: [string][]
 * Default: `Info`
 * Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
-* Max Length: `32`
 
 The level passed along with this log line.
 
@@ -276,7 +277,6 @@ The level passed along with this log line.
 * Type: [string][]
 * Default: `''`
 * Values: `YourCustomApp`
-* Max Length: `32`
 
 The app passed along with this log line.
 
@@ -286,7 +286,6 @@ The app passed along with this log line.
 * Type: [string][]
 * Default: `''`
 * Values: `YourCustomEnv`
-* Max Length: `32`
 
 The environment passed with this log line.
 

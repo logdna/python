@@ -1,4 +1,3 @@
-import json
 import logging
 import requests
 import socket
@@ -9,7 +8,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 from .configs import defaults
-from .utils import sanitize_meta, get_ip
+from .utils import sanitize_meta, get_ip, normalize_list_option
 
 
 class LogDNAHandler(logging.Handler):
@@ -32,11 +31,9 @@ class LogDNAHandler(logging.Handler):
         self.loglevel = options.get('level', 'info')
         self.app = options.get('app', '')
         self.env = options.get('env', '')
-        self.tags = options.get('tags', [])
-        if isinstance(self.tags, str):
-            self.tags = [tag.strip() for tag in self.tags.split(',')]
-        elif not isinstance(self.tags, list):
-            self.tags = []
+        self.tags = normalize_list_option(options, 'tags')
+        self.custom_fields = normalize_list_option(options, 'custom_fields')
+        self.custom_fields += defaults['META_FIELDS']
 
         # Set the Connection Variables
         self.url = options.get('url', defaults['LOGDNA_URL'])
@@ -58,8 +55,13 @@ class LogDNAHandler(logging.Handler):
         self.secondary = []
         self.exception_flag = False
         self.flusher = None
-        self.include_standard_meta = options.get('include_standard_meta',
-                                                 False)
+        self.include_standard_meta = options.get('include_standard_meta', None)
+
+        if self.include_standard_meta is not None:
+            self.internalLogger.debug(
+                '"include_standard_meta" option will be deprecated ' +
+                'removed in the upcoming major release')
+
         self.index_meta = options.get('index_meta', False)
         self.flush_limit = options.get('flush_limit', defaults['FLUSH_LIMIT'])
         self.flush_interval_secs = options.get('flush_interval',
@@ -153,16 +155,8 @@ class LogDNAHandler(logging.Handler):
         self.secondary = []
         data = {'e': 'ls', 'ls': self.buf}
         retries = 0
-        while True:
+        while retries < self.max_retry_attempts:
             retries += 1
-            if retries > self.max_retry_attempts:
-                self.internalLogger.debug(
-                    'Flush exceeded %s tries. Discarding flush buffer',
-                    self.max_retry_attempts)
-                self.close_flusher()
-                self.exception_flag = True
-                break
-
             if self.send_request(data):
                 self.clean_after_success()
                 break
@@ -170,6 +164,13 @@ class LogDNAHandler(logging.Handler):
             sleep_time = self.retry_interval_secs * (1 << (retries - 1))
             sleep_time += self.max_retry_jitter
             time.sleep(sleep_time)
+
+        if retries >= self.max_retry_attempts:
+            self.internalLogger.debug(
+                'Flush exceeded %s tries. Discarding flush buffer',
+                self.max_retry_attempts)
+            self.close_flusher()
+            self.exception_flag = True
 
     def send_request(self, data):
         try:
@@ -228,25 +229,15 @@ class LogDNAHandler(logging.Handler):
             'env': self.env
         }
 
-        opts = {}
-        if 'args' in record and not isinstance(record['args'], tuple):
-            opts = record['args']
+        message['meta'] = {}
+        for key in self.custom_fields:
+            if key in record:
+                if isinstance(record[key], tuple):
+                    message['meta'][key] = list(record[key])
+                elif record[key] is not None:
+                    message['meta'][key] = record[key]
 
-        for key in message.keys():
-            if key in opts:
-                message[key] = opts[key]
-
-        if self.include_standard_meta:
-            if 'meta' not in opts:
-                opts['meta'] = {}
-            for key in ['name', 'pathname', 'lineno']:
-                if key in record:
-                    opts['meta'][key] = record[key]
-            if self.index_meta:
-                message['meta'] = sanitize_meta(opts['meta'])
-            else:
-                message['meta'] = json.dumps(opts['meta'])
-
+        message['meta'] = sanitize_meta(message['meta'], self.index_meta)
         self.buffer_log(message)
 
     def close(self):
