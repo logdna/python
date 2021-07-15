@@ -14,7 +14,7 @@
 * [Installation](#installation)
 * [Setup](#setup)
 * [Usage](#usage)
-  * [Usage with File Config](#usage-with-file-config)
+  * [Usage with fileConfig](#usage-with-fileconfig)
 * [API](#api)
   * [LogDNAHandler(key: string, [options: dict])](#logdnahandlerkey-string-options-dict)
     * [key](#key)
@@ -70,7 +70,7 @@ _**Optional**_
 * Hostname - ([string][])
 * MAC Address - ([string][])
 * IP Address - ([string][])
-* Index Meta - ([bool][]) - formatted as options['index_meta']
+* Index Meta - ([bool][]) - formatted as `options['index_meta']`
 
 ## Usage
 
@@ -101,7 +101,7 @@ opts = {
 log.info('My Sample Log Line', opts)
 ```
 
-### Usage with File Config
+### Usage with fileConfig
 
 To use [LogDNAHandler](#logdnahandlerkey-string-options-dict) with [fileConfig][] (e.g., in a Django `settings.py` file):
 
@@ -116,7 +116,7 @@ LOGGING = {
         'logdna': {
             'level': logging.DEBUG,
             'class': 'logging.handlers.LogDNAHandler',
-            'key': os.environ.get('LOGDNA_INGEST_KEY'),
+            'key': os.environ.get('LOGDNA_INGESTION_KEY'),
             'options': {
                 'app': '<app name>',
                 'env': os.environ.get('ENVIRONMENT'),
@@ -133,7 +133,7 @@ LOGGING = {
 }
 ```
 
-(This example assumes you have set environment variables for `ENVIRONMENT` and `LOGDNA_INGEST_KEY`)
+(This example assumes you have set environment variables for `ENVIRONMENT` and `LOGDNA_INGESTION_KEY`.)
 
 ## API
 
@@ -143,7 +143,7 @@ LOGGING = {
 
 * _**Required**_
 * Type: [string][]
-* Values: `YourAPIKey`
+* Values: `<your ingestion key>`
 
 The [LogDNA API Key](https://app.logdna.com/manage/profile) associated with your account.
 
@@ -154,16 +154,16 @@ The [LogDNA API Key](https://app.logdna.com/manage/profile) associated with your
 * _Optional_
 * Type: [string][]
 * Default: `''`
-* Values: `YourCustomApp`
+* Values: `<your custom app>`
 
-The default app passed along with every log sent through this instance.
+The default app named that is included in every every log line sent through this instance.
 
 ##### env
 
 * _Optional_
 * Type: [string][]
 * Default: `''`
-* Values: `YourCustomEnv`
+* Values: `<your custom env>`
 
 The default env passed along with every log sent through this instance.
 
@@ -172,7 +172,7 @@ The default env passed along with every log sent through this instance.
 * _Optional_
 * Type: [string][]
 * Default: `''`
-* Values: `YourCustomHostname`
+* Values: `<your custom hostname>`
 
 The default hostname passed along with every log sent through this instance.
 
@@ -198,14 +198,14 @@ We allow meta objects to be passed with each line. By default these meta objects
 
 If this option is set to True then meta objects are parsed and searchable up to three levels deep. Any fields deeper than three levels are stringified and cannot be searched.
 
-*WARNING* If this option is True, your metadata objects MUST have consistent types across all log messages or the metadata object may not be parsed properly.
+*WARNING* If this option is True, your metadata objects MUST have consistent types across all log messages or the metadata object might not be parsed properly.
 
 ##### level
 
 * _Optional_
 * Type: [string][]
 * Default: `Info`
-* Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
+* Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `<your custom level>`
 
 The default level passed along with every log sent through this instance.
 
@@ -267,7 +267,7 @@ The log line to be sent to LogDNA.
 * _Optional_
 * Type: [string][]
 * Default: `Info`
-* Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `YourCustomLevel`
+* Values: `Debug`, `Trace`, `Info`, `Warn`, `Error`, `Fatal`, `<your custom level>`
 
 The level passed along with this log line.
 
@@ -276,7 +276,7 @@ The level passed along with this log line.
 * _Optional_
 * Type: [string][]
 * Default: `''`
-* Values: `YourCustomApp`
+* Values: `<your custom app>`
 
 The app passed along with this log line.
 
@@ -285,7 +285,7 @@ The app passed along with this log line.
 * _Optional_
 * Type: [string][]
 * Default: `''`
-* Values: `YourCustomEnv`
+* Values: `<your custom env>`
 
 The environment passed with this log line.
 
