@@ -2,6 +2,14 @@
 
 <!--next-version-placeholder-->
 
+## v1.17.0 (2021-07-15)
+### Feature
+* **meta:** Enable adding custom meta fields ([`f250237`](https://github.com/logdna/python/commit/f250237dbde932e99ab199023516f66a248c5e80))
+* **threadWorkerPools:** Introduce extra threads ([`9bfe479`](https://github.com/logdna/python/commit/9bfe479132acb0aa8e5784f2aa31298606e49789))
+
+### Documentation
+* Update the README as requested ([`5dd754f`](https://github.com/logdna/python/commit/5dd754f177675eb25cd5d5449bd3bcc8286f8739))
+
 ## v1.16.0 (2021-04-15)
 
 
