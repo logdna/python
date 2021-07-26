@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.0 (2021-07-26)
+### Fix
+* **opts:** Repair logging options for each call ([`e326e4c`](https://github.com/logdna/python/commit/e326e4c2461b808b5d3a885b37555f8e610615e4))
+
 ## v1.17.0 (2021-07-15)
 ### Feature
 * **meta:** Enable adding custom meta fields ([`f250237`](https://github.com/logdna/python/commit/f250237dbde932e99ab199023516f66a248c5e80))
