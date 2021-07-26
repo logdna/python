@@ -49,7 +49,7 @@ branch = true
 source = ["logdna"]
 
 [tool.coverage.report]
-fail_under = 75
+fail_under = 76
 show_missing = true
 
 [tool.coverage.json]

@@ -10,16 +10,23 @@ expectedLines = []
 LOGDNA_API_KEY = '< YOUR INGESTION KEY HERE >'
 logger = logging.getLogger('logdna')
 logger.setLevel(logging.INFO)
+sample_args = {
+    'app': 'differentTest',
+    'level': 'debug',
+    'hostname': 'differentHost',
+    'env': 'differentEnv'
+}
 sample_record = logging.LogRecord('test', logging.INFO, 'test', 5,
-                                  'Something to test', '', '', '', '')
+                                  'Something to test', [sample_args], '', '',
+                                  '')
 sample_message = {
     'line': 'Something to test',
-    'hostname': 'localhost',
-    'level': 'INFO',
-    'app': 'test',
-    'env': '',
+    'hostname': 'differentHost',
+    'level': 'debug',
+    'app': 'differentTest',
+    'env': 'differentEnv',
     'meta': {
-        'args': '',
+        'args': sample_args,
         'name': 'test',
         'pathname': 'test',
         'lineno': 5
