@@ -238,6 +238,15 @@ class LogDNAHandler(logging.Handler):
                     message['meta'][key] = record[key]
 
         message['meta'] = sanitize_meta(message['meta'], self.index_meta)
+
+        opts = {}
+        if 'args' in record and not isinstance(record['args'], tuple):
+            opts = record['args']
+
+        for key in ['app', 'env', 'hostname', 'level', 'timestamp']:
+            if key in opts:
+                message[key] = opts[key]
+
         self.buffer_log(message)
 
     def close(self):
