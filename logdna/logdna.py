@@ -109,21 +109,21 @@ class LogDNAHandler(logging.Handler):
                 self.internalLogger.debug(
                     'The buffer size exceeded the limit: %s',
                     self.buf_retention_limit)
-            self.lock.release()
 
             if self.buf_size >= self.flush_limit and not self.exception_flag:
                 self.close_flusher()
                 self.flush()
             else:
                 self.start_flusher()
+            self.lock.release()
         else:
             self.secondary.append(message)
 
     def clean_after_success(self):
-        del self.buf[:]
+        self.close_flusher()
+        self.buf.clear()
         self.buf_size = 0
         self.exception_flag = False
-        self.close_flusher()
 
     def flush(self):
         if self.worker_thread_pool:
@@ -135,8 +135,9 @@ class LogDNAHandler(logging.Handler):
                 self.internalLogger.debug('Error in calling flush: %s', e)
 
     def flush_sync(self):
-        if self.buf_size == 0:
+        if self.buf_size == 0 and len(self.secondary) == 0:
             return
+
         if self.lock.acquire(blocking=False):
             if self.request_thread_pool:
                 try:
@@ -146,8 +147,12 @@ class LogDNAHandler(logging.Handler):
                 except Exception as e:
                     self.internalLogger.debug(
                         'Error in calling try_request: %s', e)
-            self.lock.release()
+                finally:
+                    self.lock.release()
+            else:
+                self.lock.release()
         else:
+            self.close_flusher()
             self.start_flusher()
 
     def try_request(self):
@@ -181,7 +186,8 @@ class LogDNAHandler(logging.Handler):
                                          'hostname': self.hostname,
                                          'ip': self.ip,
                                          'mac': self.mac,
-                                         'tags': self.tags
+                                         'tags': self.tags,
+                                         'now': int(time.time() * 1000)
                                      },
                                      stream=True,
                                      timeout=self.request_timeout,

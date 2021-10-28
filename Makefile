@@ -38,6 +38,9 @@ debug-%: ## Debug a variable by calling `make debug-VARIABLE`
 help: ## Show this help, includes list of all actions.
 	@awk 'BEGIN {FS = ":.*?## "}; /^.+: .*?## / && !/awk/ {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' ${MAKEFILE_LIST}
 
+.PHONY:run
+run: ## purge build time artifacts
+	$(DOCKER_COMMAND) bash
 .PHONY:clean
 clean: ## purge build time artifacts
 	rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
@@ -63,11 +66,16 @@ package: ## Generate a python sdist and wheel
 	$(POETRY_COMMAND) build
 
 .PHONY:release
-release: clean install ## run semantic release build and publish results to github + pypi based on unreleased commits
+release: clean install fetch-tags ## run semantic release build and publish results to github + pypi based on unreleased commits
 	$(POETRY_COMMAND) run task release
 
+.PHONY: fetch-tags
+fetch-tags:  ## workaround for jenkins repo cloning behavior
+	git config remote.origin.url "https://logdnabot:${GH_TOKEN}@github.com/logdna/python"
+	git fetch origin --tags
+
 .PHONY:release-dry
-release-dry: clean install changelog ## run semantic release in noop mode
+release-dry: clean install fetch-tags changelog ## run semantic release in noop mode
 	$(POETRY_COMMAND) run semantic-release publish --noop --verbosity=DEBUG
 
 .PHONY:release-patch
