@@ -4,6 +4,7 @@ import socket
 import sys
 import threading
 import time
+import traceback
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -117,6 +118,7 @@ class LogDNAHandler(logging.Handler):
             else:
                 self.start_flusher()
         else:
+            print('could not acquire a lock')
             self.secondary.append(message)
 
     def clean_after_success(self):
@@ -135,6 +137,8 @@ class LogDNAHandler(logging.Handler):
                 self.internalLogger.debug('Error in calling flush: %s', e)
 
     def flush_sync(self):
+        print('buf_size {}'.format(self.buf_size))
+        print('\n'.join(traceback.format_stack()))
         if self.buf_size == 0:
             return
         if self.lock.acquire(blocking=False):
@@ -189,6 +193,8 @@ class LogDNAHandler(logging.Handler):
 
             response.raise_for_status()
             status_code = response.status_code
+            print(status_code)
+            print(response.text)
             if status_code in [401, 403]:
                 self.internalLogger.debug(
                     'Please provide a valid ingestion key.' +

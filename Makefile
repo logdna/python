@@ -5,7 +5,7 @@ include .config.mk
 
 # Define commands via docker
 DOCKER = docker
-DOCKER_RUN := $(DOCKER) run --rm -i
+DOCKER_RUN := $(DOCKER) run --rm -it
 WORKDIR :=/workdir
 DOCKER_COMMAND := $(DOCKER_RUN) -v $(PWD):$(WORKDIR):Z -w $(WORKDIR) \
 	-e XDG_CONFIG_HOME=$(WORKDIR) \
@@ -38,6 +38,9 @@ debug-%: ## Debug a variable by calling `make debug-VARIABLE`
 help: ## Show this help, includes list of all actions.
 	@awk 'BEGIN {FS = ":.*?## "}; /^.+: .*?## / && !/awk/ {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' ${MAKEFILE_LIST}
 
+.PHONY:run
+run: ## purge build time artifacts
+	$(DOCKER_COMMAND) bash
 .PHONY:clean
 clean: ## purge build time artifacts
 	rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
