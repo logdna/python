@@ -1,11 +1,14 @@
 import logging
 import unittest
 import requests
+import time
 
 from logdna import LogDNAHandler
 from concurrent.futures import ThreadPoolExecutor
 from logdna.configs import defaults
+from unittest import mock
 
+now = int(time.time())
 expectedLines = []
 LOGDNA_API_KEY = '< YOUR INGESTION KEY HERE >'
 logger = logging.getLogger('logdna')
@@ -37,7 +40,8 @@ sample_options = {
     'ip': '10.0.1.1',
     'mac': 'C0:FF:EE:C0:FF:EE',
     'tags': 'sample,test',
-    'index_meta': True
+    'index_meta': True,
+    'now': int(time.time() * 1000)
 }
 
 
@@ -124,6 +128,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         sample_message['timestamp'] = unittest.mock.ANY
         handler.buffer_log.assert_called_once_with(sample_message)
 
+    @mock.patch('time.time', unittest.mock.MagicMock(return_value=now))
     def try_request_test(self):
         requests.post = unittest.mock.Mock()
         handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
@@ -141,7 +146,8 @@ class LogDNAHandlerTest(unittest.TestCase):
                 'hostname': handler.hostname,
                 'ip': handler.ip,
                 'mac': handler.mac,
-                'tags': handler.tags
+                'tags': handler.tags,
+                'now': int(now * 1000)
             },
             stream=True,
             timeout=handler.request_timeout,
@@ -166,6 +172,26 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler.flush()
         handler.try_request.assert_called_once_with()
 
+    def flush_secondary_test(self):
+        handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+        clean = handler.clean_after_success
+        handler.worker_thread_pool = MockThreadPoolExecutor()
+        handler.request_thread_pool = MockThreadPoolExecutor()
+        handler.buf_size = 0
+        handler.secondary.append(sample_message)
+        handler.send_request = unittest.mock.MagicMock(return_value=True)
+        handler.clean_after_success = unittest.mock.Mock()
+        self.assertEqual(handler.secondary, [sample_message])
+        handler.flush()
+        handler.send_request.assert_called_with({
+            'e': 'ls',
+            'ls': [sample_message]
+        })
+
+        clean()
+        self.assertEqual(handler.secondary, [])
+        self.assertEqual(handler.buf, [])
+
     def buffer_log_test(self):
         handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
         handler.worker_thread_pool = MockThreadPoolExecutor()
@@ -187,6 +213,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         self.try_request_test()
         self.close_test()
         self.flush_test()
+        self.flush_secondary_test()
         self.buffer_log_test()
 
 
