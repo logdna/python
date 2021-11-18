@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.1 (2021-11-18)
+### Fix
+* **threading:** Account for secondary buffer flush and deadlock ([`d00b952`](https://github.com/logdna/python/commit/d00b9529d116ddf9ba454462d4d804dc54423c83))
+
 ## v1.18.0 (2021-07-26)
 ### Fix
 * **opts:** Repair logging options for each call ([`e326e4c`](https://github.com/logdna/python/commit/e326e4c2461b808b5d3a885b37555f8e610615e4))
