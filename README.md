@@ -258,7 +258,7 @@ List of fields out of `record` object to include in the `meta` object. By defaul
 
 Instance of a "sampling class". Used to decide if a log should be sent via a random selection over some distribution.  The default sends everything.  However, the `UniformSampling` class is included and extension of `Sampling` is welcome.
 
-Example usage to send 75% of your logs
+Example usage to uniformly send 75% of your logs
 ```python
 import logging
 from logdna import LogDNAHandler, UniformSampling
