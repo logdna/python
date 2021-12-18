@@ -4,9 +4,9 @@ _DEV = False
 
 class Sampling:
     """
-    Sampling class boilerplate
+    Sampling class boilerplate that returns True no matter what.
 
-    send_check is required
+    send_check is required.  It is the "decision interface".
     """
 
     def __init__(self): pass
