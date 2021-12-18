@@ -1,7 +1,5 @@
 import random
 
-_DEV = False
-
 class Sampling:
     """
     Sampling class boilerplate that returns True no matter what.
