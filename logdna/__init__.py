@@ -1,4 +1,5 @@
 from .logdna import LogDNAHandler
+from .sampling import Sampling, UniformSampling
 __all__ = ['LogDNAHandler']
 
 # Publish this class to the "logging.handlers" module so that it can be use

@@ -258,6 +258,22 @@ List of fields out of `record` object to include in the `meta` object. By defaul
 
 Instance of a "sampling class". Used to decide if a log should be sent via a random selection over some distribution.  The default sends everything.  However, the `UniformSampling` class is included and extension of `Sampling` is welcome.
 
+Example usage to send 75% of your logs
+```python
+import logging
+from logdna import LogDNAHandler, UniformSampling
+
+log.getLogger('logdna_sample')
+
+uniform_sampler = UniformSampling(send_ratio=.75)
+options = {'hostname':'py_sample_test', 'sampling_instance':uniform_sampler}
+
+logdna_handler = LogDNAHandler("API_KEY",options)
+log.addHandler(logdna_handler)
+
+log.info("Maybe I'll send, maybe I won't.")
+```
+
 ### log(line, [options])
 
 #### line
