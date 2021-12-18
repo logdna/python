@@ -33,8 +33,7 @@ class UniformSampling(Sampling):
 
     def send_check(self):
         """
-        Binary send decision based on a uniform distribution.  If number is less than send_drop_ratio, send it
+        Binary send decision based on a uniform distribution.
         """
-        if random.uniform(0.0,1.0) < self.send_drop_ratio:
-            return True # send
-        return False # don't send
+        # Send if random number is less than send_drop_ratio
+        return True if random.uniform(0.0,1.0) < self.send_drop_ratio else False
