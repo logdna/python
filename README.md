@@ -253,8 +253,8 @@ List of fields out of `record` object to include in the `meta` object. By defaul
 ##### sampling_instance
 
 * _Optional_
-* Type: [Sampling](logdna/sampling.py) class instance
-* Default: `Sampling()`, which sends everything
+* Type: Sampling class instance
+* Default: [`Sampling()`](logdna/sampling.py), which sends everything
 
 Instance of a "sampling class". Used to decide if a log should be sent via a random selection over some distribution.  The default sends everything.  However, the `UniformSampling` class is included and extension of `Sampling` is welcome.
 
