@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from .configs import defaults
 from .utils import sanitize_meta, get_ip, normalize_list_option
+from .sampling import Sampling
 
 
 class LogDNAHandler(logging.Handler):
@@ -76,6 +77,9 @@ class LogDNAHandler(logging.Handler):
 
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
+
+        # Set up sampling (class instance).  Defaults to send everything via base class
+        self.sampling_instance = options.get('sampling_instance', Sampling())
 
     def start_flusher(self):
         if not self.flusher:
@@ -178,6 +182,9 @@ class LogDNAHandler(logging.Handler):
             self.exception_flag = True
 
     def send_request(self, data):
+        # If sampling function's send_check fails, drop the log.  Naive approach, probably a better place to put this.
+        if not self.sampling_instance.send_check(): return True
+
         try:
             response = requests.post(url=self.url,
                                      json=data,

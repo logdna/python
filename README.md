@@ -250,6 +250,14 @@ A custom ingestion endpoint to stream log lines into.
 
 List of fields out of `record` object to include in the `meta` object. By default, `args`, `name`, `pathname`, and `lineno` will be included.
 
+##### sampling_instance
+
+* _Optional_
+* Type: [Sampling](logdna/sampling.py) class instance
+* Default: `Sampling()`
+
+Instance of a "sampling class". Used to decide if a log should be sent via a random selection over some distribution.  The default sends everything.  However, the `UniformSampling` class is included and extension of `Sampling` is welcome.
+
 ### log(line, [options])
 
 #### line
