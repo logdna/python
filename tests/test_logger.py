@@ -2,6 +2,7 @@ import logging
 import unittest
 import requests
 import time
+import os
 
 from logdna import LogDNAHandler
 from concurrent.futures import ThreadPoolExecutor
@@ -10,7 +11,7 @@ from unittest import mock
 
 now = int(time.time())
 expectedLines = []
-LOGDNA_API_KEY = '< YOUR INGESTION KEY HERE >'
+LOGDNA_API_KEY =  os.environ.get('LOGDNA_INGESTION_KEY')
 logger = logging.getLogger('logdna')
 logger.setLevel(logging.INFO)
 sample_args = {

@@ -190,10 +190,10 @@ class LogDNAHandler(logging.Handler):
                                          'now': int(time.time() * 1000)
                                      },
                                      stream=True,
+                                     allow_redirects=True,
                                      timeout=self.request_timeout,
                                      headers={'user-agent': self.user_agent})
 
-            response.raise_for_status()
             status_code = response.status_code
             if status_code in [401, 403]:
                 self.internalLogger.debug(
@@ -204,13 +204,15 @@ class LogDNAHandler(logging.Handler):
             if status_code == 200:
                 return True
 
-            if status_code in [400, 500, 504]:
-                self.internalLogger.debug('The request failed %s. Retrying...',
+            if status_code in [400]:
+                self.internalLogger.debug('The request failed %s. Discarding flush buffer',
                                           response.reason)
                 return True
-            else:
-                self.internalLogger.debug(
-                    'The request failed: %s. Retrying...', response.reason)
+
+            response.raise_for_status()
+
+            self.internalLogger.debug(
+                'The request failed: %s. Retrying...', response.reason)
 
         except requests.exceptions.Timeout as timeout:
             self.internalLogger.debug('Timeout error occurred %s. Retrying...',
