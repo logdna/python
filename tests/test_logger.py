@@ -1,6 +1,7 @@
 import logging
 import unittest
 import requests
+import responses
 import time
 import os
 
@@ -151,6 +152,7 @@ class LogDNAHandlerTest(unittest.TestCase):
                 'now': int(now * 1000)
             },
             stream=True,
+            allow_redirects = True,
             timeout=handler.request_timeout,
             headers={'user-agent': handler.user_agent})
 
