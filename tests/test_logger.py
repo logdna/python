@@ -12,7 +12,7 @@ from unittest import mock
 
 now = int(time.time())
 expectedLines = []
-LOGDNA_API_KEY =  os.environ.get('LOGDNA_INGESTION_KEY')
+LOGDNA_API_KEY = os.environ.get('LOGDNA_INGESTION_KEY')
 logger = logging.getLogger('logdna')
 logger.setLevel(logging.INFO)
 sample_args = {
@@ -152,7 +152,7 @@ class LogDNAHandlerTest(unittest.TestCase):
                 'now': int(now * 1000)
             },
             stream=True,
-            allow_redirects = True,
+            allow_redirects=True,
             timeout=handler.request_timeout,
             headers={'user-agent': handler.user_agent})
 

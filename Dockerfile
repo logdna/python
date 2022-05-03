@@ -1,6 +1,8 @@
 FROM condaforge/miniforge3:4.12.0-0
 
-RUN conda install -y pip poetry=1.1.7 pytest responses
-RUN pip install tap.py
+RUN conda install -y gcc pip poetry=1.1.7
+RUN mkdir /workdir
+
+
 
 

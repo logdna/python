@@ -205,7 +205,8 @@ class LogDNAHandler(logging.Handler):
                 return True
 
             if status_code in [400]:
-                self.internalLogger.debug('The request failed %s. Discarding flush buffer',
+                self.internalLogger.debug('The request failed %s.' +
+                                          'Discarding flush buffer',
                                           response.reason)
                 return True
 
