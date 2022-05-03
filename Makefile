@@ -21,12 +21,18 @@ DOCKER_COMMAND := $(DOCKER_RUN) -v $(PWD):$(WORKDIR):Z -w $(WORKDIR) \
 	-e GIT_AUTHOR_EMAIL \
 	-e GIT_COMMITTER_NAME \
 	-e GIT_COMMITTER_EMAIL \
-	us.gcr.io/logdna-k8s/python:3.7-ci
+	logdna-poetry:local
+
 
 POETRY_COMMAND := $(DOCKER_COMMAND) poetry
 
 # Exports the variables for shell use
 export
+
+# build image
+.PHONY:build-image
+build-image:
+	DOCKER_BUILDKIT=1 docker build -t logdna-poetry:local .
 
 # This helper function makes debugging much easier.
 .PHONY:debug-%
@@ -39,30 +45,31 @@ help: ## Show this help, includes list of all actions.
 	@awk 'BEGIN {FS = ":.*?## "}; /^.+: .*?## / && !/awk/ {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' ${MAKEFILE_LIST}
 
 .PHONY:run
-run: ## purge build time artifacts
+run: build-image ## purge build time artifacts
 	$(DOCKER_COMMAND) bash
+
 .PHONY:clean
 clean: ## purge build time artifacts
 	rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
 
 .PHONY:changelog
-changelog: ## print the next version of the change log to stdout
+changelog: build-image ## print the next version of the change log to stdout
 	$(POETRY_COMMAND) run semantic-release changelog --unreleased
 
 .PHONY:install
-install: ## install development and build time dependencies
+install: build-image ## install development and build time dependencies
 	$(POETRY_COMMAND) install --no-interaction -vvv
 
 .PHONY:lint
-lint: ## run lint rules and print error report
+lint: build-image ## run lint rules and print error report
 	$(POETRY_COMMAND) run task lint
 
 .PHONY:lint-fix
-lint-fix:## attempt to auto fix linting error and report remaining errors
+lint-fix: build-image ## attempt to auto fix linting error and report remaining errors
 	$(POETRY_COMMAND) run task lint:fix
 
 .PHONY:package
-package: ## Generate a python sdist and wheel
+package: build-image ## Generate a python sdist and wheel
 	$(POETRY_COMMAND) build
 
 .PHONY:release
@@ -91,6 +98,5 @@ release-major: clean install                    ## run semantic release build an
 	$(POETRY_COMMAND) run semantic-release publish --major
 
 .PHONY:test
-test:                            ## run project test suite
-	$(POETRY_COMMAND) run task test
-
+test: build-image ## run project test suite
+	$(POETRY_COMMAND) run pytest tests/
