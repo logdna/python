@@ -32,7 +32,7 @@ export
 # build image
 .PHONY:build-image
 build-image:
-	DOCKER_BUILDKIT=1 docker build -t logdna-poetry:local .
+	DOCKER_BUILDKIT=1 $(DOCKER) build -t logdna-poetry:local .
 
 # This helper function makes debugging much easier.
 .PHONY:debug-%
@@ -49,15 +49,15 @@ run: install ## purge build time artifacts
 	$(DOCKER_COMMAND) bash
 
 .PHONY:clean
-clean: ## purge build time artifacts
-	rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
+clean: build-image ## purge build time artifacts
+	$(POETRY_COMMAND) run rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
 
 .PHONY:changelog
 changelog: install ## print the next version of the change log to stdout
 	$(POETRY_COMMAND) run semantic-release changelog --unreleased
 
 .PHONY:install
-install: build-image ## install development and build time dependencies
+install: clean ## install development and build time dependencies
 	$(POETRY_COMMAND) install --no-interaction
 
 .PHONY:lint
@@ -78,7 +78,6 @@ release: clean install fetch-tags ## run semantic release build and publish resu
 
 .PHONY: fetch-tags
 fetch-tags:  ## workaround for jenkins repo cloning behavior
-	git config remote.origin.url "https://logdnabot:${GH_TOKEN}@github.com/logdna/python"
 	git fetch origin --tags
 
 .PHONY:release-dry

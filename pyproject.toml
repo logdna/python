@@ -25,7 +25,7 @@ yapf = "^0.30.0"
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
 taskipy = "^1.6.0"
-python-semantic-release = "^7.15.3"
+python-semantic-release = "^7.28.1"
 responses = "^0.20.0"
 
 [tool.taskipy.tasks]
