@@ -28,7 +28,7 @@ pipeline {
       steps {
         sh 'make install lint test'
       }
-/*
+
       post {
         always {
           junit 'coverage/test.xml'
@@ -42,7 +42,6 @@ pipeline {
           ]
         }
       }
-*/
     }
 
     stage('Release') {

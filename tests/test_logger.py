@@ -136,6 +136,12 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
         sample_message['timestamp'] = unittest.mock.ANY
         handler.buf = [sample_message]
+        responses.add(
+            responses.GET,
+            handler.url,
+            json={"error": "Internal Server Error"},
+            status=500,
+        )
         handler.try_request()
         requests.post.assert_called_with(
             url=handler.url,
