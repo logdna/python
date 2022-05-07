@@ -195,13 +195,31 @@ class LogDNAHandler(logging.Handler):
                                      headers={'user-agent': self.user_agent})
 
             status_code = response.status_code
-            if status_code in [401, 403]:
-                self.internalLogger.debug(
-                    'Please provide a valid ingestion key.' +
-                    ' Discarding flush buffer')
+            '''
+                response code:
+                    200                       expected status, OK
+                    2XX                       unexpected status
+                    301 302 303               unexpected status, per "allow_redirects=True"
+                    3XX                       unexpected status
+                    401, 403                  expected client error, invalid ingestion key
+                    4XX                       unexpected client error
+                    500 502 503 507           expected server error, transient
+                    5XX                       unexpected server error
+                handling:
+                    expected status           discard flush buffer
+                    unexpected status         log + discard flush buffer
+                    unexpected client error   log + discard flush buffer
+                    expected client error     log + discard flush buffer
+                    expected server error     log + retry
+                    unexpected server error   log + discard flush buffer
+            '''
+            if status_code == 200:
                 return True
 
-            if status_code == 200:
+            if status_code in [401, 403]:
+                self.internalLogger.debug(
+                    'Please provide a valid ingestion key. ' +
+                    'Discarding flush buffer')
                 return True
 
             if status_code in [400]:
