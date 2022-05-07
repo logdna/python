@@ -178,6 +178,12 @@ class LogDNAHandler(logging.Handler):
             self.exception_flag = True
 
     def send_request(self, data):
+        """
+            Send log data to LogDNA server
+        Returns:
+            True  - discard flush buffer
+            False - retry, keep flush buffer
+        """
         try:
             response = requests.post(url=self.url,
                                      json=data,
@@ -197,6 +203,7 @@ class LogDNAHandler(logging.Handler):
             status_code = response.status_code
             '''
                 response code:
+                    1XX                       unexpected status
                     200                       expected status, OK
                     2XX                       unexpected status
                     301 302 303               unexpected status, per "allow_redirects=True"
@@ -208,41 +215,63 @@ class LogDNAHandler(logging.Handler):
                 handling:
                     expected status           discard flush buffer
                     unexpected status         log + discard flush buffer
-                    unexpected client error   log + discard flush buffer
                     expected client error     log + discard flush buffer
+                    unexpected client error   log + discard flush buffer
                     expected server error     log + retry
                     unexpected server error   log + discard flush buffer
             '''
             if status_code == 200:
-                return True
+                return True # discard
+
+            if isinstance(response.reason, bytes):
+                # We attempt to decode utf-8 first because some servers
+                # choose to localize their reason strings. If the string
+                # isn't utf-8, we fall back to iso-8859-1 for all other
+                # encodings. (See PR #3538)
+                try:
+                    reason = response.reason.decode('utf-8')
+                except UnicodeDecodeError:
+                    reason = response.reason.decode('iso-8859-1')
+            else:
+                reason = response.reason
+
+            if 200 < status_code <= 399:
+                self.internalLogger.debug('Unexpected response: %s. ' +
+                                          'Discarding flush buffer',
+                                          reason)
+                return True # discard
 
             if status_code in [401, 403]:
                 self.internalLogger.debug(
                     'Please provide a valid ingestion key. ' +
                     'Discarding flush buffer')
-                return True
+                return True # discard
 
-            if status_code in [400]:
-                self.internalLogger.debug('The request failed %s.' +
+            if 400 <= status_code <= 499:
+                self.internalLogger.debug('Client Error: %s. ' +
                                           'Discarding flush buffer',
-                                          response.reason)
-                return True
+                                          reason)
+                return True # discard
 
-            response.raise_for_status()
+            if status_code in [500, 502, 503, 507]:
+                self.internalLogger.debug('Server Error: %s. Retrying...',
+                                          reason)
+                return False  # retry
 
-            self.internalLogger.debug(
-                'The request failed: %s. Retrying...', response.reason)
+            self.internalLogger.debug('The request failed: %s.' +
+                                      'Discarding flush buffer',
+                                      reason)
 
         except requests.exceptions.Timeout as timeout:
-            self.internalLogger.debug('Timeout error occurred %s. Retrying...',
+            self.internalLogger.debug('Timeout Error: %s. Retrying...',
                                       timeout)
+            return False  # retry
 
         except requests.exceptions.RequestException as exception:
             self.internalLogger.debug(
                 'Error sending logs %s. Discarding flush buffer', exception)
-            return True
 
-        return False
+        return True # discard
 
     def emit(self, record):
         msg = self.format(record)

@@ -59,3 +59,20 @@ class NormalizeListOptionTest(unittest.TestCase):
         self.assertEqual(value1, ['a', 'b'])
         self.assertEqual(value1, value2)
         self.assertEqual(value3, [])
+
+
+def _make_orderer():
+    order = {}
+
+    def ordered(f):
+        order[f.__name__] = len(order)
+        return f
+
+    def compare(a, b):
+        return [1, -1][order[a] > order[b]]
+
+    return ordered, compare
+
+
+ordered, _compare = _make_orderer()
+unittest.loader.TestLoader.sortTestMethodsUsing = lambda _, x, y: _compare(y, x)
