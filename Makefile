@@ -7,7 +7,7 @@ include .config.mk
 DOCKER = docker
 DOCKER_RUN := $(DOCKER) run --rm -i
 WORKDIR :=/workdir
-DOCKER_COMMAND := $(DOCKER_RUN) -v $(PWD):$(WORKDIR):Z -w $(WORKDIR) \
+DOCKER_COMMAND := $(DOCKER_RUN) -u "$(shell id -u)":"$(shell id -g)" -v $(PWD):$(WORKDIR):Z -w $(WORKDIR) \
 	-e XDG_CONFIG_HOME=$(WORKDIR) \
 	-e XDG_CACHE_HOME=$(WORKDIR) \
 	-e POETRY_CACHE_DIR=$(WORKDIR)/.cache \
@@ -49,15 +49,15 @@ run: install ## purge build time artifacts
 	$(DOCKER_COMMAND) bash
 
 .PHONY:clean
-clean: build-image ## purge build time artifacts
-	$(POETRY_COMMAND) run rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
+clean: ## purge build time artifacts
+	rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
 
 .PHONY:changelog
 changelog: install ## print the next version of the change log to stdout
 	$(POETRY_COMMAND) run semantic-release changelog --unreleased
 
 .PHONY:install
-install: clean ## install development and build time dependencies
+install: build-image ## install development and build time dependencies
 	$(POETRY_COMMAND) install --no-interaction
 
 .PHONY:lint
