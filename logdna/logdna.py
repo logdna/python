@@ -177,7 +177,7 @@ class LogDNAHandler(logging.Handler):
             self.close_flusher()
             self.exception_flag = True
 
-    def send_request(self, data):
+    def send_request(self, data): # noqa: max-complexity: 13
         """
             Send log data to LogDNA server
         Returns:
@@ -206,9 +206,11 @@ class LogDNAHandler(logging.Handler):
                     1XX                       unexpected status
                     200                       expected status, OK
                     2XX                       unexpected status
-                    301 302 303               unexpected status, per "allow_redirects=True"
+                    301 302 303               unexpected status,
+                                              per "allow_redirects=True"
                     3XX                       unexpected status
-                    401, 403                  expected client error, invalid ingestion key
+                    401, 403                  expected client error,
+                                              invalid ingestion key
                     4XX                       unexpected client error
                     500 502 503 507           expected server error, transient
                     5XX                       unexpected server error
@@ -221,7 +223,7 @@ class LogDNAHandler(logging.Handler):
                     unexpected server error   log + discard flush buffer
             '''
             if status_code == 200:
-                return True # discard
+                return True  # discard
 
             if isinstance(response.reason, bytes):
                 # We attempt to decode utf-8 first because some servers
@@ -239,19 +241,19 @@ class LogDNAHandler(logging.Handler):
                 self.internalLogger.debug('Unexpected response: %s. ' +
                                           'Discarding flush buffer',
                                           reason)
-                return True # discard
+                return True  # discard
 
             if status_code in [401, 403]:
                 self.internalLogger.debug(
                     'Please provide a valid ingestion key. ' +
                     'Discarding flush buffer')
-                return True # discard
+                return True  # discard
 
             if 400 <= status_code <= 499:
                 self.internalLogger.debug('Client Error: %s. ' +
                                           'Discarding flush buffer',
                                           reason)
-                return True # discard
+                return True  # discard
 
             if status_code in [500, 502, 503, 507]:
                 self.internalLogger.debug('Server Error: %s. Retrying...',
@@ -271,7 +273,7 @@ class LogDNAHandler(logging.Handler):
             self.internalLogger.debug(
                 'Error sending logs %s. Discarding flush buffer', exception)
 
-        return True # discard
+        return True  # discard
 
     def emit(self, record):
         msg = self.format(record)
