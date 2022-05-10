@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.2 (2022-05-10)
+### Fix
+* Requests error handling ([#82](https://github.com/logdna/python/issues/82)) ([`e412859`](https://github.com/logdna/python/commit/e4128592aa9c2301c6467115148f2f23f88da9d3))
+
 ## v1.18.1 (2021-11-18)
 ### Fix
 * **threading:** Account for secondary buffer flush and deadlock ([`d00b952`](https://github.com/logdna/python/commit/d00b9529d116ddf9ba454462d4d804dc54423c83))
