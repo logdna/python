@@ -13,7 +13,7 @@ commit_subject = "release: Version {version} [skip ci]"
 commit_author = "LogDNA Bot <bot@logdna.com>"
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "^3.7"
 requests = "^2.25.1"
 
 [tool.poetry.dev-dependencies]
@@ -25,11 +25,11 @@ yapf = "^0.30.0"
 pytest = "^6.2.2"
 pytest-cov = "^2.11.1"
 taskipy = "^1.6.0"
-python-semantic-release = "^7.15.3"
+python-semantic-release = "^7.28.1"
 
 [tool.taskipy.tasks]
 pre_test = "mkdir -p coverage"
-test = "pytest --junitxml=coverage/test.xml --cov=logdna --cov-report=html --verbose"
+test = "pytest --junitxml=coverage/test.xml --cov=logdna --cov-report=html --verbose tests/"
 post_test = "python scripts/json_coverage.py"
 lint = "flake8 --doctests"
 "lint:fix" =  "yapf -r -i logdna scripts tests"

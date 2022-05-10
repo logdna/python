@@ -5,7 +5,12 @@ def DEFAULT_BRANCH = 'master'
 def CURRENT_BRANCH = [env.CHANGE_BRANCH, env.BRANCH_NAME]?.find{branch -> branch != null}
 
 pipeline {
-  agent none
+  agent {
+    node {
+      label 'ec2-fleet'
+      customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}"
+    }
+  }
 
   options {
     timestamps()
@@ -18,12 +23,6 @@ pipeline {
 
   stages {
     stage('Test') {
-      agent {
-        node {
-          label 'ec2-fleet'
-          customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}"
-        }
-      }
 
       steps {
         sh 'make install lint test'
@@ -45,12 +44,6 @@ pipeline {
     }
 
     stage('Release') {
-      agent {
-        node {
-          label 'ec2-fleet'
-          customWorkspace "${PROJECT_NAME}-${BUILD_NUMBER}"
-        }
-      }
 
       stages {
         stage('dry run') {

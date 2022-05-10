@@ -7,7 +7,7 @@ include .config.mk
 DOCKER = docker
 DOCKER_RUN := $(DOCKER) run --rm -i
 WORKDIR :=/workdir
-DOCKER_COMMAND := $(DOCKER_RUN) -v $(PWD):$(WORKDIR):Z -w $(WORKDIR) \
+DOCKER_COMMAND := $(DOCKER_RUN) -u "$(shell id -u)":"$(shell id -g)" -v $(PWD):$(WORKDIR):Z -w $(WORKDIR) \
 	-e XDG_CONFIG_HOME=$(WORKDIR) \
 	-e XDG_CACHE_HOME=$(WORKDIR) \
 	-e POETRY_CACHE_DIR=$(WORKDIR)/.cache \
@@ -21,12 +21,18 @@ DOCKER_COMMAND := $(DOCKER_RUN) -v $(PWD):$(WORKDIR):Z -w $(WORKDIR) \
 	-e GIT_AUTHOR_EMAIL \
 	-e GIT_COMMITTER_NAME \
 	-e GIT_COMMITTER_EMAIL \
-	us.gcr.io/logdna-k8s/python:3.7-ci
+	logdna-poetry:local
+
 
 POETRY_COMMAND := $(DOCKER_COMMAND) poetry
 
 # Exports the variables for shell use
 export
+
+# build image
+.PHONY:build-image
+build-image:
+	DOCKER_BUILDKIT=1 $(DOCKER) build -t logdna-poetry:local .
 
 # This helper function makes debugging much easier.
 .PHONY:debug-%
@@ -39,30 +45,31 @@ help: ## Show this help, includes list of all actions.
 	@awk 'BEGIN {FS = ":.*?## "}; /^.+: .*?## / && !/awk/ {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' ${MAKEFILE_LIST}
 
 .PHONY:run
-run: ## purge build time artifacts
+run: install ## purge build time artifacts
 	$(DOCKER_COMMAND) bash
+
 .PHONY:clean
 clean: ## purge build time artifacts
 	rm -rf dist/ build/ coverage/ pypoetry/ pip/ **/__pycache__/ .pytest_cache/ .cache .coverage
 
 .PHONY:changelog
-changelog: ## print the next version of the change log to stdout
+changelog: install ## print the next version of the change log to stdout
 	$(POETRY_COMMAND) run semantic-release changelog --unreleased
 
 .PHONY:install
-install: ## install development and build time dependencies
-	$(POETRY_COMMAND) install --no-interaction -vvv
+install: build-image ## install development and build time dependencies
+	$(POETRY_COMMAND) install --no-interaction
 
 .PHONY:lint
-lint: ## run lint rules and print error report
+lint: install ## run lint rules and print error report
 	$(POETRY_COMMAND) run task lint
 
 .PHONY:lint-fix
-lint-fix:## attempt to auto fix linting error and report remaining errors
+lint-fix: install ## attempt to auto fix linting error and report remaining errors
 	$(POETRY_COMMAND) run task lint:fix
 
 .PHONY:package
-package: ## Generate a python sdist and wheel
+package: install ## Generate a python sdist and wheel
 	$(POETRY_COMMAND) build
 
 .PHONY:release
@@ -71,7 +78,6 @@ release: clean install fetch-tags ## run semantic release build and publish resu
 
 .PHONY: fetch-tags
 fetch-tags:  ## workaround for jenkins repo cloning behavior
-	git config remote.origin.url "https://logdnabot:${GH_TOKEN}@github.com/logdna/python"
 	git fetch origin --tags
 
 .PHONY:release-dry
@@ -91,6 +97,5 @@ release-major: clean install                    ## run semantic release build an
 	$(POETRY_COMMAND) run semantic-release publish --major
 
 .PHONY:test
-test:                            ## run project test suite
+test: install ## run project test suite
 	$(POETRY_COMMAND) run task test
-
