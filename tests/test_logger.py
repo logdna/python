@@ -250,7 +250,7 @@ class LogDNAHandlerTest(unittest.TestCase):
 
 class LogDNAPipelineHandlerTest(unittest.TestCase):
     def test_handler(self):
-        handler = LogDNAPipelineHandler(LOGDNA_API_KEY, sample_options)
+        handler = LogDNAPipelineHandler(LOGDNA_PIPELINE_API_KEY, sample_options)
         self.assertEqual(handler.auth, None)
         self.assertEqual(handler.post_headers['authorization'], handler.key)
         self.assertEqual(handler.post_headers['Content-Type'], 'application/json')
