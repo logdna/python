@@ -4,7 +4,7 @@ import requests
 import time
 import os
 
-from logdna import LogDNAHandler
+from logdna import LogDNAHandler, LogDNAPipelineHandler
 from concurrent.futures import ThreadPoolExecutor
 from logdna.configs import defaults
 from unittest import mock
@@ -13,6 +13,7 @@ from unittest.mock import patch
 now = int(time.time())
 expectedLines = []
 LOGDNA_API_KEY = os.environ.get('LOGDNA_INGESTION_KEY')
+LOGDNA_PIPELINE_API_KEY = os.environ.get('LOGDNA_PIPELINE_INGESTION_KEY')
 logger = logging.getLogger('logdna')
 logger.setLevel(logging.INFO)
 sample_args = {
@@ -245,6 +246,15 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler.flush.assert_called_once_with()
         self.assertEqual(handler.buf, [sample_message])
         self.assertEqual(handler.buf_size, len(sample_message['line']))
+
+
+class LogDNAPipelineHandlerTest(unittest.TestCase):
+    def test_handler(self):
+        handler = LogDNAPipelineHandler(LOGDNA_API_KEY, sample_options)
+        self.assertEqual(handler.auth, None)
+        self.assertEqual(handler.post_headers['authorization'], handler.key)
+        self.assertEqual(handler.post_headers['Content-Type'], 'application/json')
+        self.assertEqual(handler.post_headers['user-agent'], handler.user_agent)
 
 
 if __name__ == '__main__':

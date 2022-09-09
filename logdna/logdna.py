@@ -76,6 +76,8 @@ class LogDNAHandler(logging.Handler):
 
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
+        self.post_headers = {'user-agent': self.user_agent}
+        self.auth = ('user', self.key)
 
     def start_flusher(self):
         if not self.flusher:
@@ -177,7 +179,7 @@ class LogDNAHandler(logging.Handler):
             self.close_flusher()
             self.exception_flag = True
 
-    def send_request(self, data): # noqa: max-complexity: 13
+    def send_request(self, data):  # noqa: max-complexity: 13
         """
             Send log data to LogDNA server
         Returns:
@@ -187,7 +189,7 @@ class LogDNAHandler(logging.Handler):
         try:
             response = requests.post(url=self.url,
                                      json=data,
-                                     auth=('user', self.key),
+                                     auth=self.auth,
                                      params={
                                          'hostname': self.hostname,
                                          'ip': self.ip,
@@ -198,7 +200,7 @@ class LogDNAHandler(logging.Handler):
                                      stream=True,
                                      allow_redirects=True,
                                      timeout=self.request_timeout,
-                                     headers={'user-agent': self.user_agent})
+                                     headers=self.post_headers)
 
             status_code = response.status_code
             '''
@@ -317,3 +319,17 @@ class LogDNAHandler(logging.Handler):
             self.request_thread_pool.shutdown(wait=True)
             self.request_thread_pool = None
         logging.Handler.close(self)
+
+
+class LogDNAPipelineHandler(LogDNAHandler):
+    def __init__(self, key, options={}):
+        """
+        Leverage the existing logger but modify the headers and remove standard auth
+        :param key: The Pipeline Key
+        :param options: Passthrough to the logger
+        """
+        super().__init__(key, options)
+        self.auth = None
+        self.post_headers = {'user-agent': self.user_agent,
+                             'authorization': self.key,
+                             'Content-Type': 'application/json'}

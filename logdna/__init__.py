@@ -1,4 +1,4 @@
-from .logdna import LogDNAHandler
+from .logdna import LogDNAHandler, LogDNAPipelineHandler
 __all__ = ['LogDNAHandler']
 
 # Publish this class to the "logging.handlers" module so that it can be use
@@ -6,3 +6,4 @@ __all__ = ['LogDNAHandler']
 import logging.handlers
 
 logging.handlers.LogDNAHandler = LogDNAHandler
+logging.handlers.LogDNAPipelineHandler = LogDNAPipelineHandler
