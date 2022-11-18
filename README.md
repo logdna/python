@@ -54,12 +54,14 @@ options = {
 
 # Defaults to False; when True meta objects are searchable
 options['index_meta'] = True
+options['custom_fields'] = 'meta'
+
 
 test = LogDNAHandler(key, options)
 
 log.addHandler(test)
 
-log.warning("Warning message", {'app': 'bloop'})
+log.warning("Warning message", extra={'app': 'bloop'})
 log.info("Info message")
 
 ```
@@ -80,10 +82,10 @@ After initial setup, logging is as easy as:
 log.info('My Sample Log Line')
 
 # Add a custom level
-log.info('My Sample Log Line', { 'level': 'MyCustomLevel' })
+log.info('My Sample Log Line', extra={ 'level': 'MyCustomLevel' })
 
 # Include an App name with this specific log
-log.info('My Sample Log Line', { 'level': 'Warn', 'app': 'myAppName'})
+log.info('My Sample Log Line', extra={ 'level': 'Warn', 'app': 'myAppName'})
 
 # Pass associated objects along as metadata
 meta = {
@@ -98,7 +100,7 @@ opts = {
     'meta': meta
 }
 
-log.info('My Sample Log Line', opts)
+log.info('My Sample Log Line', extra=opts)
 ```
 
 ### Usage with fileConfig
