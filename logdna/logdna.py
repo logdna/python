@@ -34,6 +34,7 @@ class LogDNAHandler(logging.Handler):
         self.tags = normalize_list_option(options, 'tags')
         self.custom_fields = normalize_list_option(options, 'custom_fields')
         self.custom_fields += defaults['META_FIELDS']
+        self.log_error_response = options.get('log_error_response', False)
 
         # Set the Connection Variables
         self.url = options.get('url', defaults['LOGDNA_URL'])
@@ -177,7 +178,7 @@ class LogDNAHandler(logging.Handler):
             self.close_flusher()
             self.exception_flag = True
 
-    def send_request(self, data): # noqa: max-complexity: 13
+    def send_request(self, data):  # noqa: max-complexity: 13
         """
             Send log data to LogDNA server
         Returns:
@@ -241,23 +242,35 @@ class LogDNAHandler(logging.Handler):
                 self.internalLogger.debug('Unexpected response: %s. ' +
                                           'Discarding flush buffer',
                                           reason)
+                if self.log_error_response:
+                    self.internalLogger.debug(
+                        'Error Response: %s', response.text)
                 return True  # discard
 
             if status_code in [401, 403]:
                 self.internalLogger.debug(
                     'Please provide a valid ingestion key. ' +
                     'Discarding flush buffer')
+                if self.log_error_response:
+                    self.internalLogger.debug(
+                        'Error Response: %s', response.text)
                 return True  # discard
 
             if 400 <= status_code <= 499:
                 self.internalLogger.debug('Client Error: %s. ' +
                                           'Discarding flush buffer',
                                           reason)
+                if self.log_error_response:
+                    self.internalLogger.debug(
+                        'Error Response: %s', response.text)
                 return True  # discard
 
             if status_code in [500, 502, 503, 507]:
                 self.internalLogger.debug('Server Error: %s. Retrying...',
                                           reason)
+                if self.log_error_response:
+                    self.internalLogger.debug(
+                        'Error Response: %s', response.text)
                 return False  # retry
 
             self.internalLogger.debug('The request failed: %s.' +
