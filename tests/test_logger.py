@@ -194,6 +194,21 @@ class LogDNAHandlerTest(unittest.TestCase):
             self.assertFalse(handler.exception_flag)
             self.assertTrue(post_mock.call_count, 1)
 
+    @mock.patch('time.time', unittest.mock.MagicMock(return_value=now))
+    def test_try_request_403_log_response(self):
+        with patch('requests.post') as post_mock:
+            r = requests.Response()
+            r.status_code = 403
+            r.reason = 'OK'
+            post_mock.return_value = r
+            sample_options['log_error_response'] = True
+            handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+            sample_message['timestamp'] = unittest.mock.ANY
+            handler.buf = [sample_message]
+            handler.try_request()
+            self.assertFalse(handler.exception_flag)
+            self.assertTrue(post_mock.call_count, 1)
+
     def test_close(self):
         handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
         handler.close_flusher = unittest.mock.Mock()
