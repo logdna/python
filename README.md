@@ -252,6 +252,14 @@ A custom ingestion endpoint to stream log lines into.
 
 List of fields out of `record` object to include in the `meta` object. By default, `args`, `name`, `pathname`, and `lineno` will be included.
 
+##### log_error_response
+
+* _Optional_
+* Type: [bool][]
+* Default: `False`
+
+Enables logging of the API response when an HTTP error is encountered
+
 ### log(line, [options])
 
 #### line
