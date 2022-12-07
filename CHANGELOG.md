@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.3 (2022-12-07)
+### Fix
+* Add documentation for log_error_response option ([#88](https://github.com/logdna/python/issues/88)) ([`d5bf85c`](https://github.com/logdna/python/commit/d5bf85ca26579e0186e1abdbcd1b6c44c60c9eca))
+
 ## v1.18.2 (2022-05-10)
 ### Fix
 * Requests error handling ([#82](https://github.com/logdna/python/issues/82)) ([`e412859`](https://github.com/logdna/python/commit/e4128592aa9c2301c6467115148f2f23f88da9d3))
