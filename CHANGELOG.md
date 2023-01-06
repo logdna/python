@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.4 (2023-01-06)
+### Fix
+* Dependabot -> Vulnerabilities -> cryptography >= 37.0.0 < 38.0.3 ([#91](https://github.com/logdna/python/issues/91)) ([`7ccde50`](https://github.com/logdna/python/commit/7ccde50ba50c0abbec1a7efe4dd665e8b35511c0))
+
 ## v1.18.3 (2022-12-07)
 ### Fix
 * Add documentation for log_error_response option ([#88](https://github.com/logdna/python/issues/88)) ([`d5bf85c`](https://github.com/logdna/python/commit/d5bf85ca26579e0186e1abdbcd1b6c44c60c9eca))
