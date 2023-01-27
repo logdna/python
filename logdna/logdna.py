@@ -258,7 +258,7 @@ class LogDNAHandler(logging.Handler):
                         'Error Response: %s', response.text)
                 return True  # discard
 
-            if status_code in [429]:
+            if status_code == 429:
                 self.internalLogger.debug('Client Error: %s. Retrying...',
                                           reason)
                 if self.log_error_response:
