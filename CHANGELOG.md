@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.6 (2023-01-27)
+### Fix
+* Added retries for http 429 504 ([#93](https://github.com/logdna/python/issues/93)) ([`712d81d`](https://github.com/logdna/python/commit/712d81d4ab2bfbf95d65898fb365a5bcb1396199))
+
 ## v1.18.5 (2023-01-27)
 ### Fix
 * **chore:** Upgraded pytest to resolve security vulnerability in py <= 1.11.0 ([#92](https://github.com/logdna/python/issues/92)) ([`905b06a`](https://github.com/logdna/python/commit/905b06a648e19896087b0c51ba1e055212727560))
