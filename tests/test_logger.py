@@ -171,7 +171,49 @@ class LogDNAHandlerTest(unittest.TestCase):
         with patch('requests.post') as post_mock:
             r = requests.Response()
             r.status_code = 500
-            r.reason = 'OK'
+            r.reason = 'Internal Server Error'
+            post_mock.return_value = r
+            handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+            sample_message['timestamp'] = unittest.mock.ANY
+            handler.buf = [sample_message]
+            handler.try_request()
+            self.assertTrue(handler.exception_flag)
+            self.assertTrue(post_mock.call_count, 3)
+
+    @mock.patch('time.time', unittest.mock.MagicMock(return_value=now))
+    def test_try_request_502(self):
+        with patch('requests.post') as post_mock:
+            r = requests.Response()
+            r.status_code = 502
+            r.reason = 'Bad Gateway'
+            post_mock.return_value = r
+            handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+            sample_message['timestamp'] = unittest.mock.ANY
+            handler.buf = [sample_message]
+            handler.try_request()
+            self.assertTrue(handler.exception_flag)
+            self.assertTrue(post_mock.call_count, 3)
+
+    @mock.patch('time.time', unittest.mock.MagicMock(return_value=now))
+    def test_try_request_504(self):
+        with patch('requests.post') as post_mock:
+            r = requests.Response()
+            r.status_code = 504
+            r.reason = 'Gateway Timeout'
+            post_mock.return_value = r
+            handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+            sample_message['timestamp'] = unittest.mock.ANY
+            handler.buf = [sample_message]
+            handler.try_request()
+            self.assertTrue(handler.exception_flag)
+            self.assertTrue(post_mock.call_count, 3)
+
+    @mock.patch('time.time', unittest.mock.MagicMock(return_value=now))
+    def test_try_request_429(self):
+        with patch('requests.post') as post_mock:
+            r = requests.Response()
+            r.status_code = 429
+            r.reason = 'Too Many Requests'
             post_mock.return_value = r
             handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
             sample_message['timestamp'] = unittest.mock.ANY
@@ -185,7 +227,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         with patch('requests.post') as post_mock:
             r = requests.Response()
             r.status_code = 403
-            r.reason = 'OK'
+            r.reason = 'Forbidden'
             post_mock.return_value = r
             handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
             sample_message['timestamp'] = unittest.mock.ANY
@@ -199,7 +241,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         with patch('requests.post') as post_mock:
             r = requests.Response()
             r.status_code = 403
-            r.reason = 'OK'
+            r.reason = 'Forbidden'
             post_mock.return_value = r
             sample_options['log_error_response'] = True
             handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)

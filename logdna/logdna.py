@@ -212,8 +212,10 @@ class LogDNAHandler(logging.Handler):
                     3XX                       unexpected status
                     401, 403                  expected client error,
                                               invalid ingestion key
+                    429                       expected server error,
+                                              "client error", transient
                     4XX                       unexpected client error
-                    500 502 503 507           expected server error, transient
+                    500 502 503 504 507       expected server error, transient
                     5XX                       unexpected server error
                 handling:
                     expected status           discard flush buffer
@@ -256,6 +258,14 @@ class LogDNAHandler(logging.Handler):
                         'Error Response: %s', response.text)
                 return True  # discard
 
+            if status_code in [429]:
+                self.internalLogger.debug('Client Error: %s. Retrying...',
+                                          reason)
+                if self.log_error_response:
+                    self.internalLogger.debug(
+                        'Error Response: %s', response.text)
+                return False  # retry
+
             if 400 <= status_code <= 499:
                 self.internalLogger.debug('Client Error: %s. ' +
                                           'Discarding flush buffer',
@@ -265,7 +275,7 @@ class LogDNAHandler(logging.Handler):
                         'Error Response: %s', response.text)
                 return True  # discard
 
-            if status_code in [500, 502, 503, 507]:
+            if status_code in [500, 502, 503, 504, 507]:
                 self.internalLogger.debug('Server Error: %s. Retrying...',
                                           reason)
                 if self.log_error_response:
