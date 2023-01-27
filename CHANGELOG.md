@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.5 (2023-01-27)
+### Fix
+* **chore:** Upgraded pytest to resolve security vulnerability in py <= 1.11.0 ([#92](https://github.com/logdna/python/issues/92)) ([`905b06a`](https://github.com/logdna/python/commit/905b06a648e19896087b0c51ba1e055212727560))
+
 ## v1.18.4 (2023-01-06)
 ### Fix
 * Dependabot -> Vulnerabilities -> cryptography >= 37.0.0 < 38.0.3 ([#91](https://github.com/logdna/python/issues/91)) ([`7ccde50`](https://github.com/logdna/python/commit/7ccde50ba50c0abbec1a7efe4dd665e8b35511c0))
