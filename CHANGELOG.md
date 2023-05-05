@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.7 (2023-05-05)
+### Fix
+* Gate buils from non maintainers ([`97803b5`](https://github.com/logdna/python/commit/97803b55a102539a75b0763891c1d27757460067))
+
 ## v1.18.6 (2023-01-27)
 ### Fix
 * Added retries for http 429 504 ([#93](https://github.com/logdna/python/issues/93)) ([`712d81d`](https://github.com/logdna/python/commit/712d81d4ab2bfbf95d65898fb365a5bcb1396199))
