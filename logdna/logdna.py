@@ -53,7 +53,6 @@ class LogDNAHandler(logging.Handler):
         # Set the Flush-related Variables
         self.buf = []
         self.buf_size = 0
-        self.secondary = []
         self.exception_flag = False
         self.flusher = None
         self.include_standard_meta = options.get('include_standard_meta', None)
@@ -100,9 +99,8 @@ class LogDNAHandler(logging.Handler):
                 self.internalLogger.debug('Error in calling buffer_log: %s', e)
 
     def buffer_log_sync(self, message):
-        # Attempt to acquire lock to write to buf
-        # otherwise write to secondary as flush occurs
-        if self.lock.acquire(blocking=False):
+        # Attempt to acquire lock to write to buffer
+        if self.lock.acquire(blocking=True):
             try:
                 msglen = len(message['line'])
                 if self.buf_size + msglen < self.buf_retention_limit:
@@ -123,25 +121,15 @@ class LogDNAHandler(logging.Handler):
                 self.internalLogger.exception(f'Error in buffer_log_sync: {e}')
             finally:
                 self.lock.release()
-        else:
-            self.secondary.append(message)
 
     def clean_after_success(self):
         self.close_flusher()
-        self.buf.clear()
-        self.buf_size = 0
         self.exception_flag = False
 
     def flush(self):
-        if self.worker_thread_pool:
-            try:
-                self.worker_thread_pool.submit(self.flush_sync)
-            except RuntimeError:
-                self.flush_sync()
-            except Exception as e:
-                self.internalLogger.debug('Error in calling flush: %s', e)
+        self.schedule_flush_sync()
 
-    def flush_sync(self, should_block=False):
+    def schedule_flush_sync(self, should_block=False):
         if self.request_thread_pool:
             try:
                 self.request_thread_pool.submit(
@@ -153,25 +141,25 @@ class LogDNAHandler(logging.Handler):
                     'Error in calling try_lock_and_do_flush_request: %s', e)
 
     def try_lock_and_do_flush_request(self, should_block=False):
+        local_buf = []
         if self.lock.acquire(blocking=should_block):
-            try:
-                self.try_request()
-            except Exception as e:
-                self.internalLogger.debug(
-                    'Error in calling try_request: %s', e)
-            finally:
+            if not self.buf:
                 self.lock.release()
+                return
+
+            local_buf = self.buf.copy()
+            self.buf.clear()
+            self.buf_size = 0
+            self.lock.release()
         else:
             self.close_flusher()
             self.start_flusher()
 
-    def try_request(self):
-        if not self.buf and not self.secondary:
-            return
+        if local_buf:
+            self.try_request(local_buf)
 
-        self.buf.extend(self.secondary)
-        self.secondary = []
-        data = {'e': 'ls', 'ls': self.buf}
+    def try_request(self, buf):
+        data = {'e': 'ls', 'ls': buf}
         retries = 0
         while retries < self.max_retry_attempts:
             retries += 1
@@ -360,11 +348,12 @@ class LogDNAHandler(logging.Handler):
         # application exiting and because the probability of this
         # introducing a noticeable delay is very low because close() is only
         # called when the logger and application are shutting down.
-        self.flush_sync(should_block=True)
+        self.schedule_flush_sync(should_block=True)
 
         # Finally, shut down the thread pool that was used to send the log
         # messages to the server. We can assume at this point that all log
-        # messages have been sent to the server.
+        # messages that were in the buffer prior to the worker threads
+        # shutting down have been sent to the server.
         if self.request_thread_pool:
             self.request_thread_pool.shutdown(wait=True)
             self.request_thread_pool = None
