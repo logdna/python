@@ -257,7 +257,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler.flush_sync = unittest.mock.Mock()
         handler.close()
         handler.close_flusher.assert_called_once_with()
-        handler.flush_sync.assert_called_once_with()
+        handler.flush_sync.assert_called_once_with(should_block=True)
         self.assertIsNone(handler.worker_thread_pool)
         self.assertIsNone(handler.request_thread_pool)
 
@@ -302,6 +302,56 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler.flush.assert_called_once_with()
         self.assertEqual(handler.buf, [sample_message])
         self.assertEqual(handler.buf_size, len(sample_message['line']))
+
+    # Attempts to reproduce the specific scenario that resulted in
+    # https://mezmo.atlassian.net/browse/LOG-15414 where log messages
+    # would be dropped due to race conditions. The test essentially
+    # does the following:
+    # 1. Create a LogDNAHandler
+    # 2. Call handler.emit() with a large number of log records at a rate
+    #    sufficiently high to trigger the race
+    # 3. Verify that no log records are dropped.
+    #
+    # This test is not deterministic, but it should be sufficient to
+    # catch regressions. It reliably reproduces the issue in question
+    # and fails with the previous version of this code.
+    @mock.patch('time.time', unittest.mock.MagicMock(return_value=now))
+    def test_when_emitManyLogs_then_noLogsDropped(self):
+        num_logs = 10**5
+        received = set()
+
+        def append_received(json=None, **kwargs):
+            ids = [log['line'] for log in json['ls']]
+            for id in ids:
+                received.add(id)
+            r = requests.Response()
+            r.status_code = 200
+            r.reason = 'OK'
+            # Simulate some reasonable request latency
+            time.sleep(0.1)
+            return r
+
+        def get_sample_record(id):
+            return logging.LogRecord(
+                name='test',
+                level=logging.INFO,
+                pathname='test',
+                lineno=5,
+                msg=str(id),
+                args=[sample_args],
+                exc_info='',
+                func='',
+                sinfo='')
+
+        with patch('requests.post', side_effect=append_received):
+            handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+
+            for i in range(num_logs):
+                handler.emit(get_sample_record(i))
+            handler.close()
+
+        self.assertEqual(len(received), num_logs)
+        self.assertFalse(handler.exception_flag)
 
 
 if __name__ == '__main__':
