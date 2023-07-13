@@ -53,8 +53,7 @@ class LogDNAHandler(logging.Handler):
         # Set the Flush-related Variables
         self.buf = []
         self.buf_size = 0
-        self.exception_flag = False
-        self.flusher = None
+
         self.include_standard_meta = options.get('include_standard_meta', None)
 
         if self.include_standard_meta is not None:
@@ -77,15 +76,23 @@ class LogDNAHandler(logging.Handler):
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
 
-    def start_flusher(self):
-        if not self.flusher:
-            self.flusher = threading.Timer(
-                self.flush_interval_secs, self.flush)
-            self.flusher.start()
+        # Start the flusher
+        self.flusher_stopped = threading.Event()
+        self.flusher = threading.Timer(
+            self.flush_interval_secs, self.flush_timer_worker)
+        self.flusher.start()
+
+    def flush_timer_worker(self):
+        while not self.flusher_stopped.wait(self.flush_interval_secs):
+            try:
+                self.flush()
+            except Exception as e:
+                self.internalLogger.exception(
+                    f'Error in flush_timer_worker: {e}')
 
     def close_flusher(self):
-        # Cancel the flusher if it is not currently in the process of flushing.
         if self.flusher:
+            self.flusher_stopped.set()
             self.flusher.cancel()
             self.flusher = None
 
@@ -111,20 +118,12 @@ class LogDNAHandler(logging.Handler):
                         'The buffer size exceeded the limit: %s',
                         self.buf_retention_limit)
 
-                if self.buf_size >= self.flush_limit and \
-                        not self.exception_flag:
-                    self.close_flusher()
+                if self.buf_size >= self.flush_limit:
                     self.flush()
-                else:
-                    self.start_flusher()
             except Exception as e:
                 self.internalLogger.exception(f'Error in buffer_log_sync: {e}')
             finally:
                 self.lock.release()
-
-    def clean_after_success(self):
-        self.close_flusher()
-        self.exception_flag = False
 
     def flush(self):
         self.schedule_flush_sync()
@@ -147,13 +146,11 @@ class LogDNAHandler(logging.Handler):
                 self.lock.release()
                 return
 
-            local_buf = self.buf.copy()
-            self.buf.clear()
-            self.buf_size = 0
+            if self.buf:
+                local_buf = self.buf.copy()
+                self.buf.clear()
+                self.buf_size = 0
             self.lock.release()
-        else:
-            self.close_flusher()
-            self.start_flusher()
 
         if local_buf:
             self.try_request(local_buf)
@@ -164,7 +161,6 @@ class LogDNAHandler(logging.Handler):
         while retries < self.max_retry_attempts:
             retries += 1
             if self.send_request(data):
-                self.clean_after_success()
                 break
 
             sleep_time = self.retry_interval_secs * (1 << (retries - 1))
@@ -175,8 +171,6 @@ class LogDNAHandler(logging.Handler):
             self.internalLogger.debug(
                 'Flush exceeded %s tries. Discarding flush buffer',
                 self.max_retry_attempts)
-            self.close_flusher()
-            self.exception_flag = True
 
     def send_request(self, data):  # noqa: max-complexity: 13
         """
