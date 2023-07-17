@@ -313,7 +313,6 @@ class LogDNAHandlerTest(unittest.TestCase):
                 sinfo='')
 
         with patch('requests.post', side_effect=append_received):
-
             for i in range(num_logs):
                 self.handler.emit(get_sample_record(i))
             self.handler.close()
