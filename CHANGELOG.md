@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.8 (2023-07-18)
+### Fix
+* Bump semver ([#101](https://github.com/logdna/python/issues/101)) ([`913e5f4`](https://github.com/logdna/python/commit/913e5f4f35f2920a6b2162022b93495b4774654c))
+
 ## v1.18.7 (2023-05-05)
 ### Fix
 * Gate buils from non maintainers ([`97803b5`](https://github.com/logdna/python/commit/97803b55a102539a75b0763891c1d27757460067))
