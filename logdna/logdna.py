@@ -78,8 +78,8 @@ class LogDNAHandler(logging.Handler):
 
         # Start the flusher
         self.flusher_stopped = threading.Event()
-        self.flusher = threading.Timer(
-            self.flush_interval_secs, self.flush_timer_worker)
+        self.flusher = threading.Thread(
+            target=self.flush_timer_worker, daemon=True)
         self.flusher.start()
 
     def flush_timer_worker(self):
@@ -93,7 +93,7 @@ class LogDNAHandler(logging.Handler):
     def close_flusher(self):
         if self.flusher:
             self.flusher_stopped.set()
-            self.flusher.cancel()
+            self.flusher.join()
             self.flusher = None
 
     def buffer_log(self, message):

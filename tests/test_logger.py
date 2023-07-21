@@ -320,6 +320,11 @@ class LogDNAHandlerTest(unittest.TestCase):
         self.assertEqual(len(received), num_logs)
         self.assertEquals(set(received), set(range(num_logs)))
 
+    def test_when_handlerShutDown_then_handlerDoesNotHang(self):
+        handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+        self.assertIsNotNone(handler)
+        # Do nothing. This test should pass by virtue of not hanging.
+
 
 if __name__ == '__main__':
     unittest.main()
