@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.9 (2023-07-21)
+### Fix
+* Make flush thread a daemon thread to prevent shutdown hang ([#102](https://github.com/logdna/python/issues/102)) ([`17a69b0`](https://github.com/logdna/python/commit/17a69b044de43a7a9d7d3e6eb65a0c60f1fa23f0))
+
 ## v1.18.8 (2023-07-18)
 ### Fix
 * Bump semver ([#101](https://github.com/logdna/python/issues/101)) ([`913e5f4`](https://github.com/logdna/python/commit/913e5f4f35f2920a6b2162022b93495b4774654c))
