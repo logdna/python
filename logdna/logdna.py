@@ -180,9 +180,12 @@ class LogDNAHandler(logging.Handler):
             False - retry, keep flush buffer
         """
         try:
+            headers = {
+                'user-agent': self.user_agent,
+                'apikey': self.key
+            }
             response = requests.post(url=self.url,
                                      json=data,
-                                     auth=('user', self.key),
                                      params={
                                          'hostname': self.hostname,
                                          'ip': self.ip,
@@ -193,7 +196,7 @@ class LogDNAHandler(logging.Handler):
                                      stream=True,
                                      allow_redirects=True,
                                      timeout=self.request_timeout,
-                                     headers={'user-agent': self.user_agent})
+                                     headers=headers)
 
             status_code = response.status_code
             '''
