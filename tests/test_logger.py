@@ -153,7 +153,6 @@ class LogDNAHandlerTest(unittest.TestCase):
                     'e': 'ls',
                     'ls': test_buf
                 },
-                auth=('user', self.handler.key),
                 params={
                     'hostname': self.handler.hostname,
                     'ip': self.handler.ip,
@@ -164,7 +163,9 @@ class LogDNAHandlerTest(unittest.TestCase):
                 stream=True,
                 allow_redirects=True,
                 timeout=self.handler.request_timeout,
-                headers={'user-agent': self.handler.user_agent})
+                headers={
+                    'user-agent': self.handler.user_agent,
+                    'apikey': LOGDNA_API_KEY})
             self.assertTrue(post_mock.call_count, 1)
 
     @mock.patch('time.time', unittest.mock.MagicMock(return_value=now))
