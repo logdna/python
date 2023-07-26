@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.11 (2023-07-26)
+### Fix
+* Remove Thread/event to fix Django regression ([#107](https://github.com/logdna/python/issues/107)) ([`0337a09`](https://github.com/logdna/python/commit/0337a09433953227dabb0b65da8583e8f9273986))
+
 ## v1.18.10 (2023-07-26)
 ### Fix
 * Utilize apikey header for auth to make compatible with pipelines ([#104](https://github.com/logdna/python/issues/104)) ([`5394e97`](https://github.com/logdna/python/commit/5394e9714779878cd415a4566cd44d9183e150b9))
