@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.10 (2023-07-26)
+### Fix
+* Utilize apikey header for auth to make compatible with pipelines ([#104](https://github.com/logdna/python/issues/104)) ([`5394e97`](https://github.com/logdna/python/commit/5394e9714779878cd415a4566cd44d9183e150b9))
+
 ## v1.18.9 (2023-07-21)
 ### Fix
 * Make flush thread a daemon thread to prevent shutdown hang ([#102](https://github.com/logdna/python/issues/102)) ([`17a69b0`](https://github.com/logdna/python/commit/17a69b044de43a7a9d7d3e6eb65a0c60f1fa23f0))
