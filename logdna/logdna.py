@@ -76,24 +76,17 @@ class LogDNAHandler(logging.Handler):
         self.setLevel(logging.DEBUG)
         self.lock = threading.RLock()
 
-        # Start the flusher
-        self.flusher_stopped = threading.Event()
-        self.flusher = threading.Thread(
-            target=self.flush_timer_worker, daemon=True)
-        self.flusher.start()
+        self.flusher = None
 
-    def flush_timer_worker(self):
-        while not self.flusher_stopped.wait(self.flush_interval_secs):
-            try:
-                self.flush()
-            except Exception as e:
-                self.internalLogger.exception(
-                    f'Error in flush_timer_worker: {e}')
+    def start_flusher(self):
+        if not self.flusher:
+            self.flusher = threading.Timer(
+                self.flush_interval_secs, self.flush)
+            self.flusher.start()
 
     def close_flusher(self):
         if self.flusher:
-            self.flusher_stopped.set()
-            self.flusher.join()
+            self.flusher.cancel()
             self.flusher = None
 
     def buffer_log(self, message):
@@ -119,7 +112,10 @@ class LogDNAHandler(logging.Handler):
                         self.buf_retention_limit)
 
                 if self.buf_size >= self.flush_limit:
+                    self.close_flusher()
                     self.flush()
+                else:
+                    self.start_flusher()
             except Exception as e:
                 self.internalLogger.exception(f'Error in buffer_log_sync: {e}')
             finally:
@@ -143,13 +139,15 @@ class LogDNAHandler(logging.Handler):
         local_buf = []
         if self.lock.acquire(blocking=should_block):
             if not self.buf:
+                self.close_flusher()
                 self.lock.release()
                 return
 
-            if self.buf:
-                local_buf = self.buf.copy()
-                self.buf.clear()
-                self.buf_size = 0
+            local_buf = self.buf.copy()
+            self.buf.clear()
+            self.buf_size = 0
+            if local_buf:
+                self.close_flusher()
             self.lock.release()
 
         if local_buf:
@@ -304,10 +302,10 @@ class LogDNAHandler(logging.Handler):
             'line': msg,
             'level': record['levelname'] or self.loglevel,
             'app': self.app or record['module'],
-            'env': self.env
+            'env': self.env,
+            'meta': {}
         }
 
-        message['meta'] = {}
         for key in self.custom_fields:
             if key in record:
                 if isinstance(record[key], tuple):
@@ -328,6 +326,9 @@ class LogDNAHandler(logging.Handler):
         self.buffer_log(message)
 
     def close(self):
+        # Close the flusher
+        self.close_flusher()
+
         # First gracefully shut down any threads that are still attempting
         # to add log messages to the buffer. This ensures that we don't lose
         # any log messages that are in the process of being added to the
@@ -335,10 +336,6 @@ class LogDNAHandler(logging.Handler):
         if self.worker_thread_pool:
             self.worker_thread_pool.shutdown(wait=True)
             self.worker_thread_pool = None
-
-        # Now that we've shut down the worker threads, we can safely close
-        # the flusher thread.
-        self.close_flusher()
 
         # Manually force a flush of any remaining log messages in the buffer.
         # We block here to ensure that the flush completes prior to the
