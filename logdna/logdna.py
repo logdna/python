@@ -74,7 +74,7 @@ class LogDNAHandler(logging.Handler):
             max_workers=self.max_concurrent_requests)
 
         self.setLevel(logging.DEBUG)
-        self.lock = threading.RLock()
+        self._lock = threading.RLock()
 
         self.flusher = None
 
@@ -100,7 +100,7 @@ class LogDNAHandler(logging.Handler):
 
     def buffer_log_sync(self, message):
         # Attempt to acquire lock to write to buffer
-        if self.lock.acquire(blocking=True):
+        if self._lock.acquire(blocking=True):
             try:
                 msglen = len(message['line'])
                 if self.buf_size + msglen < self.buf_retention_limit:
@@ -119,7 +119,7 @@ class LogDNAHandler(logging.Handler):
             except Exception as e:
                 self.internalLogger.exception(f'Error in buffer_log_sync: {e}')
             finally:
-                self.lock.release()
+                self._lock.release()
 
     def flush(self):
         self.schedule_flush_sync()
@@ -137,10 +137,10 @@ class LogDNAHandler(logging.Handler):
 
     def try_lock_and_do_flush_request(self, should_block=False):
         local_buf = []
-        if self.lock.acquire(blocking=should_block):
+        if self._lock.acquire(blocking=should_block):
             if not self.buf:
                 self.close_flusher()
-                self.lock.release()
+                self._lock.release()
                 return
 
             local_buf = self.buf.copy()
@@ -148,7 +148,7 @@ class LogDNAHandler(logging.Handler):
             self.buf_size = 0
             if local_buf:
                 self.close_flusher()
-            self.lock.release()
+            self._lock.release()
 
         if local_buf:
             self.try_request(local_buf)
@@ -351,4 +351,5 @@ class LogDNAHandler(logging.Handler):
         if self.request_thread_pool:
             self.request_thread_pool.shutdown(wait=True)
             self.request_thread_pool = None
+
         logging.Handler.close(self)

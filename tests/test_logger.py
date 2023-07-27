@@ -255,14 +255,27 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
         close_flusher_mock = unittest.mock.Mock()
         close_flusher_mock.side_effect = handler.close_flusher
-        handler.close_flusher = close_flusher_mock
         handler.schedule_flush_sync = unittest.mock.Mock()
+        handler.close_flusher = close_flusher_mock
         handler.close()
         handler.close_flusher.assert_called_once_with()
         handler.schedule_flush_sync.assert_called_once_with(
             should_block=True)
         self.assertIsNone(handler.worker_thread_pool)
         self.assertIsNone(handler.request_thread_pool)
+
+    # These should be separate objects, since there is already
+    # a variable in the base class named self.lock. We want
+    # to make sure that a separate lock is created for the
+    # locking semantics of the LogDNA Handler
+    def test_lock_var_separate_from_local_lock_var(self):
+        handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+        self.assertIsNotNone(handler)
+
+        # Test that we did not replace the base class' instance var.
+        self.assertIsNotNone(handler._lock)
+        self.assertIsNotNone(handler.lock)
+        self.assertNotEquals(handler.lock, handler._lock)
 
     def test_flush(self):
         handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
