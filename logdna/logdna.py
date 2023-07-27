@@ -342,7 +342,7 @@ class LogDNAHandler(logging.Handler):
         # application exiting and because the probability of this
         # introducing a noticeable delay is very low because close() is only
         # called when the logger and application are shutting down.
-        self.schedule_flush_sync(should_block=True)
+        self.try_lock_and_do_flush_request(should_block=True)
 
         # Finally, shut down the thread pool that was used to send the log
         # messages to the server. We can assume at this point that all log
@@ -351,4 +351,5 @@ class LogDNAHandler(logging.Handler):
         if self.request_thread_pool:
             self.request_thread_pool.shutdown(wait=True)
             self.request_thread_pool = None
+
         logging.Handler.close(self)

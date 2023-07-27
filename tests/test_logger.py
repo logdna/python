@@ -255,12 +255,11 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
         close_flusher_mock = unittest.mock.Mock()
         close_flusher_mock.side_effect = handler.close_flusher
+        handler.try_lock_and_do_flush_request = unittest.mock.Mock()
         handler.close_flusher = close_flusher_mock
-        handler.schedule_flush_sync = unittest.mock.Mock()
         handler.close()
         handler.close_flusher.assert_called_once_with()
-        handler.schedule_flush_sync.assert_called_once_with(
-            should_block=True)
+        handler.try_lock_and_do_flush_request.assert_called_once_with(should_block=True)
         self.assertIsNone(handler.worker_thread_pool)
         self.assertIsNone(handler.request_thread_pool)
 
