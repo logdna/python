@@ -2,6 +2,10 @@
 
 <!--next-version-placeholder-->
 
+## v1.18.12 (2023-07-27)
+### Fix
+* Don't overwrite base logging Handler class lock var ([#108](https://github.com/logdna/python/issues/108)) ([`5b04d72`](https://github.com/logdna/python/commit/5b04d72b42686d926fb5e73dadb2d7a1ba16d9c3))
+
 ## v1.18.11 (2023-07-26)
 ### Fix
 * Remove Thread/event to fix Django regression ([#107](https://github.com/logdna/python/issues/107)) ([`0337a09`](https://github.com/logdna/python/commit/0337a09433953227dabb0b65da8583e8f9273986))
