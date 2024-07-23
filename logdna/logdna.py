@@ -122,20 +122,18 @@ class LogDNAHandler(logging.Handler):
                 self._lock.release()
 
     def flush(self):
-        self.schedule_flush_sync()
-
-    def schedule_flush_sync(self, should_block=False):
+        should_block = False
         if self.request_thread_pool:
             try:
                 self.request_thread_pool.submit(
-                    self.try_lock_and_do_flush_request, should_block)
+                    self.flush_sync, should_block)
             except RuntimeError:
-                self.try_lock_and_do_flush_request(should_block)
+                self.flush_sync(should_block)
             except Exception as e:
                 self.internalLogger.debug(
                     'Error in calling try_lock_and_do_flush_request: %s', e)
 
-    def try_lock_and_do_flush_request(self, should_block=False):
+    def flush_sync(self, should_block=False):
         local_buf = []
         if self._lock.acquire(blocking=should_block):
             if not self.buf:
@@ -337,19 +335,19 @@ class LogDNAHandler(logging.Handler):
             self.worker_thread_pool.shutdown(wait=True)
             self.worker_thread_pool = None
 
-        # Manually force a flush of any remaining log messages in the buffer.
+        # Shut down the thread pool that was used to send the log messages to
+        # the server. We can assume at this point that all log messages that
+        # were in the buffer prior to the worker threads shutting down have
+        # been sent to the server.
+        if self.request_thread_pool:
+            self.request_thread_pool.shutdown(wait=True)
+            self.request_thread_pool = None
+
+        # Finally force a flush of any remaining log messages in the buffer.
         # We block here to ensure that the flush completes prior to the
         # application exiting and because the probability of this
         # introducing a noticeable delay is very low because close() is only
         # called when the logger and application are shutting down.
-        self.schedule_flush_sync(should_block=True)
-
-        # Finally, shut down the thread pool that was used to send the log
-        # messages to the server. We can assume at this point that all log
-        # messages that were in the buffer prior to the worker threads
-        # shutting down have been sent to the server.
-        if self.request_thread_pool:
-            self.request_thread_pool.shutdown(wait=True)
-            self.request_thread_pool = None
+        self.flush_sync(should_block=True)
 
         logging.Handler.close(self)

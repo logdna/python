@@ -4,6 +4,7 @@ import requests
 import time
 import os
 
+import pytest
 from logdna import LogDNAHandler
 from concurrent.futures import ThreadPoolExecutor
 from logdna.configs import defaults
@@ -140,7 +141,7 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler.buffer_log.assert_called_once_with(sample_message)
 
     @mock.patch('time.time', unittest.mock.MagicMock(return_value=now))
-    def test_try_lock_and_do_flush_request(self):
+    def test_flush_sync(self):
         with patch('requests.post') as post_mock:
             handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
             r = requests.Response()
@@ -150,7 +151,7 @@ class LogDNAHandlerTest(unittest.TestCase):
             sample_message['timestamp'] = unittest.mock.ANY
             handler.buf = [sample_message]
             test_buf = handler.buf.copy()
-            handler.try_lock_and_do_flush_request()
+            handler.flush_sync()
             post_mock.assert_called_with(
                 url=handler.url,
                 json={
@@ -255,14 +256,23 @@ class LogDNAHandlerTest(unittest.TestCase):
         handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
         close_flusher_mock = unittest.mock.Mock()
         close_flusher_mock.side_effect = handler.close_flusher
-        handler.schedule_flush_sync = unittest.mock.Mock()
+        handler.flush_sync = unittest.mock.Mock()
         handler.close_flusher = close_flusher_mock
         handler.close()
         handler.close_flusher.assert_called_once_with()
-        handler.schedule_flush_sync.assert_called_once_with(
+        handler.flush_sync.assert_called_once_with(
             should_block=True)
         self.assertIsNone(handler.worker_thread_pool)
         self.assertIsNone(handler.request_thread_pool)
+
+    @pytest.mark.timeout(3)
+    def test_simultaneous_close_and_log_should_not_deadlock(self):
+        handler = LogDNAHandler(LOGDNA_API_KEY, sample_options)
+        logging.basicConfig(
+            level=logging.INFO, handlers=[handler], force=True)
+        logger.info("test message")
+        logging.basicConfig(
+            level=logging.INFO, handlers=[handler], force=True)
 
     # These should be separate objects, since there is already
     # a variable in the base class named self.lock. We want
