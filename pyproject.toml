@@ -13,8 +13,9 @@ commit_subject = "release: Version {version} [skip ci]"
 commit_author = "LogDNA Bot <bot@logdna.com>"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 requests = "^2.28.1"
+httpx = "^0.28.1"
 
 [tool.poetry.dev-dependencies]
 coverage = "^5.4"
