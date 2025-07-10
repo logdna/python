@@ -305,7 +305,7 @@ The environment passed with this log line.
 * Type: [dict][]
 * Default: `None`
 
-A standard dictonary containing additional metadata about the log line that is passed. Please ensure values are JSON serializable.
+A standard dictionary containing additional metadata about the log line that is passed. Please ensure values are JSON serializable.
 
 **NOTE**: Values that are not JSON serializable will be removed and the respective keys will be added to the `__errors` string.
 
